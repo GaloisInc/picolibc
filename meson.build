@@ -852,3 +852,8 @@ configure_file(output : 'picolibc.h',
 if not enable_multilib and meson.is_subproject()
   picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c, lib_m])
 endif
+
+
+if host_machine.cpu_family() == 'fromager'
+  subdir('fromager')
+endif
