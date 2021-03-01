@@ -6,5 +6,6 @@ exec `dirname $0`/do-configure x86_64-unknown-fromager \
     -Dpicocrt=false \
     -Dio-c99-formats=false \
     -Dio-float-exact=false \
+    -Dnewlib-nano-malloc=false \
 	-Dtests=false \
 	"$@"

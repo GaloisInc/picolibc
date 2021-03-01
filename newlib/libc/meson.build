@@ -48,6 +48,7 @@ machine_dirs = {
 		 'epiphany': 'epiphany',
 		 'fido': 'm68k',
 		 'fr30': 'fr30',
+		 'fromager': 'fromager',
 		 'frv': 'frv',
 		 'ft32': 'ft32',
 		 'h8300': 'h8300',
