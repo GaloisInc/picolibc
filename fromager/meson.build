@@ -12,6 +12,7 @@ foreach target : targets
     input: libc,
     output: 'libc.bc',
     command: [link_staticlib_bitcode, '@INPUT@', '@OUTPUT@'],
-    install: false)
+    install: true,
+    install_dir: instdir)
 endforeach
 
