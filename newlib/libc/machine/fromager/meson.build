@@ -3,6 +3,8 @@
 srcs_machine = [
   'nanocxx.cpp',
 
+  'stack_protector.c',
+
   # Replace all the malloc implementation functions.
   'malloc-calloc.c',
   'malloc-cfree.c',
