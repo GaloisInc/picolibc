@@ -2,6 +2,7 @@
 
 srcs_machine = [
   'llvm_intrin.c',
+  'nanocxx.cpp',
 
   # Replace all the malloc implementation functions.
   'malloc-calloc.c',
