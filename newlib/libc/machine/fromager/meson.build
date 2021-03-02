@@ -1,7 +1,6 @@
 # Copyright © 2021 Galois, Inc.  All rights reserved.
 
 srcs_machine = [
-  'llvm_intrin.c',
   'nanocxx.cpp',
 
   # Replace all the malloc implementation functions.
@@ -23,11 +22,23 @@ inc_headers_machine = [
   'fromager.h',
 ]
 
+srcs_machine_builtins = [
+	'llvm_intrin.c',
+]
+
 foreach target : targets
 	value = get_variable('target_' + target)
+
+	builtins_objs = static_library('machine_builtins' + target,
+		srcs_machine_builtins,
+		pic: false,
+		include_directories: inc,
+		c_args: value[1] + ['-fno-builtin']).extract_all_objects()
+
 	set_variable('lib_machine' + target,
 		static_library('machine' + target,
 			srcs_machine,
+			objects: builtins_objs,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))
