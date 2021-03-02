@@ -43,4 +43,5 @@ unsigned long getauxval(unsigned long type)
 	errno = EINVAL;
 	return 0;
 }
-__weak_reference(getauxval, __getauxval);
+// FROMAGER: Weak refs are not supported by MicroRAM yet.
+//__weak_reference(getauxval, __getauxval);
