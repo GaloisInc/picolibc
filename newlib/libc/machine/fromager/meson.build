@@ -2,6 +2,7 @@
 
 srcs_machine = [
   'nanocxx.cpp',
+  'syscalls.c',
 
   'stack_protector.c',
 
