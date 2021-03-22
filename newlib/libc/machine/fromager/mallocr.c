@@ -34,7 +34,7 @@ char* malloc_internal(size_t size) {
     size_t region_size = 1ull << ((addr >> 58) & 63);
     // The allocated region must have space for `size` bytes, plus an
     // additional word for metadata.
-    __cc_valid_if(region_size >= size + sizeof(uintptr_t),
+    __cc_valid_if(region_size >= size + 2 * sizeof(uintptr_t),
         "allocated region size is too small");
     __cc_valid_if(addr % region_size == 0,
         "allocated address is misaligned for its region size");
@@ -45,8 +45,11 @@ char* malloc_internal(size_t size) {
     // tampering.  This will make the trace invalid if the metadata word is
     // already poisoned (this happens if the prover tries to return the same
     // region for two separate allocations).
-    uintptr_t* metadata = (uintptr_t*)(ptr + region_size - sizeof(uintptr_t));
+    uintptr_t* metadata = (uintptr_t*)(ptr + region_size - 2 * sizeof(uintptr_t));
     __cc_write_and_poison(metadata, 1);
+
+    size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
+    *size_ptr = size;
 
     // Choose a word to poison in the range `ptr .. metadata`.
     uintptr_t* poison = __cc_advise_poison(ptr + size, (char*)metadata);
@@ -95,7 +98,7 @@ void free_internal(char* ptr) {
     __cc_free(ptr);
 
     // Choose an address to poison.
-    uintptr_t* metadata = (uintptr_t*)(ptr + region_size - sizeof(uintptr_t));
+    uintptr_t* metadata = (uintptr_t*)(ptr + region_size - 2 * sizeof(uintptr_t));
     uintptr_t* poison = __cc_advise_poison(ptr, (char*)metadata);
     if (poison != NULL) {
         // The poisoned address must be well-aligned.
@@ -112,6 +115,25 @@ void free_internal(char* ptr) {
 
 void free(void* ptr) {
     free_internal((char*)ptr);
+}
+#endif
+
+#ifdef DEFINE_REALLOC
+void *realloc(void *ptr, size_t size) {
+    uintptr_t log_region_size = (uintptr_t)ptr >> 58;
+    uintptr_t region_size = 1ull << log_region_size;
+    __cc_bug_if((uintptr_t)ptr % region_size != 0,
+        "realloc'd pointer not the start of a region");
+
+    size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
+    size_t old_size = *size_ptr;
+
+    size_t copy_size = old_size < size ? old_size : size;
+    void* new_ptr = malloc(size);
+    memcpy(new_ptr, ptr, copy_size);
+    free(ptr);
+
+    return new_ptr;
 }
 #endif
 
