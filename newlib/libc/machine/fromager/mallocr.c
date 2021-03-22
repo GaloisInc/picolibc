@@ -114,3 +114,16 @@ void free(void* ptr) {
     free_internal((char*)ptr);
 }
 #endif
+
+#ifdef DEFINE_MEMALIGN
+int posix_memalign(void **memptr, size_t alignment, size_t size) {
+    // `malloc(N)` always returns a pointer that is aligned to the next power
+    // of two >= `N`.
+    size_t adj_size = size;
+    if (alignment > size) {
+        size = alignment;
+    }
+    *memptr = malloc(size);
+    return 0;
+}
+#endif
