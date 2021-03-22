@@ -1,6 +1,7 @@
 # Copyright © 2021 Galois, Inc.  All rights reserved.
 
 srcs_machine = [
+  'misc.c',
   'nanocxx.cpp',
   'syscalls.c',
 
