@@ -3,7 +3,6 @@
 srcs_machine = [
   'misc.c',
   'nanocxx.cpp',
-  'syscalls.c',
 
   'stack_protector.c',
 
@@ -30,6 +29,14 @@ srcs_machine_builtins = [
 	'llvm_intrin.c',
 ]
 
+srcs_machine_syscalls = [
+  'syscalls.c',
+]
+
+srcs_machine_syscalls_native = [
+  'syscalls_native.c',
+]
+
 foreach target : targets
 	value = get_variable('target_' + target)
 
@@ -46,6 +53,22 @@ foreach target : targets
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))
+
+      static_library('machine_syscalls' + target,
+          srcs_machine_syscalls,
+          pic: false,
+          include_directories: inc,
+          c_args: value[1],
+          install: true,
+          install_dir: instdir)
+
+      static_library('machine_syscalls_native' + target,
+          srcs_machine_syscalls_native,
+          pic: false,
+          include_directories: inc,
+          c_args: value[1],
+          install: true,
+          install_dir: instdir)
 endforeach
 
 install_headers(inc_headers_machine)

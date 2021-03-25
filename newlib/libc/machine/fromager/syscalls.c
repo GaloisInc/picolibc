@@ -31,3 +31,7 @@ void _exit(int status) {
         __cc_trace("_exit");
     }
 }
+
+void __cc_malloc_init(void* addr) __attribute__((noinline)) {
+    // No-op.  In `syscalls_native,c`, this is replaced with an `mmap` call.
+}

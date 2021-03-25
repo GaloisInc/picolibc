@@ -8,6 +8,7 @@
  */
 #include <stdint.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <fromager.h>
 
 // Allocate `size` bytes of memory.
@@ -23,6 +24,12 @@ uintptr_t* __cc_advise_poison(char* start, char* end);
 // Write `val` to `*ptr` and poison `*ptr`.  If `*ptr` is already poisoned, the
 // trace is invalid.
 void __cc_write_and_poison(uintptr_t* ptr, uintptr_t val);
+
+
+#define FROMAGER_SIMPLE_MALLOC
+
+
+#ifndef FROMAGER_SIMPLE_MALLOC
 
 #ifdef DEFINE_MALLOC
 // Allocate a block of `size` bytes.
@@ -149,3 +156,70 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
     return 0;
 }
 #endif
+
+#else // FROMAGER_SIMPLE_MALLOC
+
+#if FROMAGER_TRACE
+# include <stdio.h>
+# define TRACE(...) fprintf(stderr, "[TRACE] " __VA_ARGS__)
+#else
+# define TRACE(...) ((void)0)
+#endif
+
+#ifdef DEFINE_MALLOC
+void* malloc(size_t size) {
+    void* out;
+    posix_memalign(&out, 16, size);
+    TRACE("malloc: %lu bytes at %lx\n", size, out);
+    return out;
+}
+#endif
+
+#ifdef DEFINE_FREE
+void free(void* ptr) {
+}
+#endif
+
+#ifdef DEFINE_REALLOC
+void *realloc(void *ptr, size_t size) {
+    if (ptr == NULL) {
+        return malloc(size);
+    }
+
+    TRACE("realloc %x to %d\n", (uintptr_t)ptr, size);
+    size_t old_size = *(size_t*)(ptr - sizeof(size_t));
+    size_t copy_size = old_size < size ? old_size : size;
+    TRACE("  got old size %d, copy %d", old_size, copy_size);
+    void* new_ptr = malloc(size);
+    memcpy(new_ptr, ptr, copy_size);
+    free(ptr);
+
+    TRACE("realloc: %lu bytes at %lx\n", size, new_ptr);
+    return new_ptr;
+}
+#endif
+
+#ifdef DEFINE_MEMALIGN
+void __cc_malloc_init(void* addr) __attribute__((noinline));
+
+int posix_memalign(void **memptr, size_t alignment, size_t size) __attribute__((noinline)) {
+    static uintptr_t pos;
+    if (!pos) {
+        pos = 0x10000000;
+        __cc_malloc_init((void*)pos);
+    }
+
+    if (alignment < sizeof(size_t)) {
+        alignment = sizeof(size_t);
+    }
+
+    pos += sizeof(size_t);
+    pos = (pos + alignment - 1) & ~(alignment - 1);
+    *memptr = (void*)pos;
+    *(size_t*)(pos - sizeof(size_t)) = size;
+    pos += size;
+    return 0;
+}
+#endif
+
+#endif // FROMAGER_SIMPLE_MALLOC
