@@ -40,35 +40,36 @@ srcs_machine_syscalls_native = [
 foreach target : targets
 	value = get_variable('target_' + target)
 
-	builtins_objs = static_library('machine_builtins' + target,
+	static_library('machine_builtins' + target,
 		srcs_machine_builtins,
 		pic: false,
 		include_directories: inc,
-		c_args: value[1] + ['-fno-builtin']).extract_all_objects()
+		c_args: value[1] + ['-fno-builtin'],
+        install: true,
+        install_dir: instdir)
 
 	set_variable('lib_machine' + target,
 		static_library('machine' + target,
 			srcs_machine,
-			objects: builtins_objs,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))
 
-      static_library('machine_syscalls' + target,
-          srcs_machine_syscalls,
-          pic: false,
-          include_directories: inc,
-          c_args: value[1],
-          install: true,
-          install_dir: instdir)
+    static_library('machine_syscalls' + target,
+        srcs_machine_syscalls,
+        pic: false,
+        include_directories: inc,
+        c_args: value[1],
+        install: true,
+        install_dir: instdir)
 
-      static_library('machine_syscalls_native' + target,
-          srcs_machine_syscalls_native,
-          pic: false,
-          include_directories: inc,
-          c_args: value[1],
-          install: true,
-          install_dir: instdir)
+    static_library('machine_syscalls_native' + target,
+        srcs_machine_syscalls_native,
+        pic: false,
+        include_directories: inc,
+        c_args: value[1],
+        install: true,
+        install_dir: instdir)
 endforeach
 
 install_headers(inc_headers_machine)

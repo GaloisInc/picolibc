@@ -1,12 +1,30 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 void __llvm__memcpy__p0i8__p0i8__i64(uint8_t *dest, const uint8_t *src, uint64_t len) {
-    memcpy(dest, src, len);
+    uint8_t* dest_end = dest + len;
+    for (; dest != dest_end; ++src, ++dest) {
+        *dest = *src;
+    }
 }
 
 void __llvm__memmove__p0i8__p0i8__i64(uint8_t *dest, const uint8_t *src, uint64_t len) {
-    memmove(dest, src, len);
+    if ((uintptr_t)dest <= (uintptr_t)src) {
+        uint8_t* dest_end = dest + len;
+        for (; dest != dest_end; ++src, ++dest) {
+            *dest = *src;
+        }
+    } else {
+        uint8_t* dest_start = dest;
+        dest += len;
+        src += len;
+        while (dest != dest_start) {
+            --src;
+            --dest;
+            *dest = *src;
+        }
+    }
 }
 
 void __llvm__memset__p0i8__i64(uint8_t *dest, uint8_t val, uint64_t len) {
