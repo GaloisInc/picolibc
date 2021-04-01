@@ -1,9 +1,12 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <errno.h>
+#include "fromager.h"
 
 
 // Indicate that the current trace is invalid.
@@ -108,6 +111,19 @@ void __cc_malloc_init(void* addr) __attribute__((noinline)) {
     if (addr2 != addr) {
         abort();
     }
+}
+
+void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinline)) {
+    __cc_valid_if(__cc_malloc_heap_end() == NULL,
+        "heap has already been initialized");
+    void* heap = __cc_malloc_heap_start();
+    void* heap2 = mmap(heap, 64 * 1024 * 1024, PROT_READ | PROT_WRITE,
+            MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+    if (heap2 != heap) {
+        abort();
+    }
+    memcpy(heap, addr, len);
+    __cc_malloc_set_heap_end(heap + len);
 }
 
 

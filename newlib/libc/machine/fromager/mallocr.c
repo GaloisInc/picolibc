@@ -202,10 +202,30 @@ void *realloc(void *ptr, size_t size) {
 #ifdef DEFINE_MEMALIGN
 void __cc_malloc_init(void* addr) __attribute__((noinline));
 
+#define POS_INIT 0x100000000ul
+
+static uintptr_t pos = 0;
+
+void* __cc_heap_snapshot(size_t* len) __attribute__((noinline)) {
+    *len = pos - POS_INIT;
+    return (void*)POS_INIT;
+}
+
+void* __cc_malloc_heap_start() __attribute__((noinline)) {
+    return (void*)POS_INIT;
+}
+
+void* __cc_malloc_heap_end() __attribute__((noinline)) {
+    return (void*)pos;
+}
+
+void __cc_malloc_set_heap_end(void* new_end) __attribute__((noinline)) {
+    pos = (uintptr_t)new_end;
+}
+
 int posix_memalign(void **memptr, size_t alignment, size_t size) __attribute__((noinline)) {
-    static uintptr_t pos;
     if (!pos) {
-        pos = 0x10000000;
+        pos = POS_INIT;
         __cc_malloc_init((void*)pos);
     }
 

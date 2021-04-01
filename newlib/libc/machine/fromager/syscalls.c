@@ -35,3 +35,11 @@ void _exit(int status) {
 void __cc_malloc_init(void* addr) __attribute__((noinline)) {
     // No-op.  In `syscalls_native,c`, this is replaced with an `mmap` call.
 }
+
+void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinline)) {
+    __cc_valid_if(addr == __cc_malloc_heap_start(),
+        "heap snapshot was placed at the wrong location");
+    __cc_valid_if(__cc_malloc_heap_end() == NULL,
+        "heap has already been initialized");
+    __cc_malloc_set_heap_end(addr + len);
+}

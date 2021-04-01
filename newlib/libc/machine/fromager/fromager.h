@@ -36,6 +36,13 @@ static inline void __cc_bug_if(int cond, const char* msg) {
     }
 }
 
+
+void* __cc_heap_snapshot(size_t* len) __attribute__((noinline));
+void* __cc_malloc_heap_start() __attribute__((noinline));
+void* __cc_malloc_heap_end() __attribute__((noinline));
+void __cc_malloc_set_heap_end(void* new_end) __attribute__((noinline));
+void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinline));
+
 #ifdef __cplusplus
 }
 #endif
