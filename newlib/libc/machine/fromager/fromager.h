@@ -15,7 +15,7 @@ void __cc_trace(const char* msg);
 
 // Assert that the trace is valid only if `cond` is non-zero.  If the trace is
 // invalid, `msg` will be printed when running in the MicroRAM interpreter.
-inline void __cc_valid_if(int cond, const char* msg) {
+static inline void __cc_valid_if(int cond, const char* msg) {
     if (!cond) {
         __cc_flag_invalid();
 #ifdef FROMAGER_DEBUG
@@ -27,7 +27,7 @@ inline void __cc_valid_if(int cond, const char* msg) {
 // Indicate that the program has exhibited a bug if `cond` is non-zero.  If the
 // bug is present, `msg` will be printed when running in the MicroRAM
 // interpreter.
-inline void __cc_bug_if(int cond, const char* msg) {
+static inline void __cc_bug_if(int cond, const char* msg) {
     if (cond) {
         __cc_flag_bug();
 #ifdef FROMAGER_DEBUG
