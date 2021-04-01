@@ -129,10 +129,7 @@ void _exit(int status) {
         errno = -rax;
         rax = -1;
     }
-}
-
-void abort() {
-    _exit(1);
+    for (;;) {}
 }
 
 // Copied from bits/mman-linux.h
