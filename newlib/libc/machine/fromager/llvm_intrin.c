@@ -34,7 +34,8 @@ void __llvm__memset__p0i8__i64(uint8_t *dest, uint8_t val, uint64_t len) {
 }
 
 uint32_t __llvm__bswap__i32(uint32_t x) {
-    uint8_t a = x >> 0;
+    volatile uint32_t x0 = x;
+    uint8_t a = x0 >> 0;
     uint8_t b = x >> 8;
     uint8_t c = x >> 16;
     uint8_t d = x >> 24;
