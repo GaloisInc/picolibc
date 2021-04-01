@@ -46,6 +46,40 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
     return (void*)rax;
 }
 
+int open(const char* name, int flags, int mode) {
+    register int rax __asm__ ("rax") = __NR_open;
+    register const char* rdi __asm__ ("rdi") = name;
+    register int rsi __asm__ ("rsi") = flags;
+    register int rdx __asm__ ("rdx") = mode;
+    __asm__ __volatile__ (
+        "syscall"
+        : "+r" (rax)
+        : "r" (rdi), "r" (rsi), "r" (rdx)
+        : "cc", "rcx", "r11", "memory"
+    );
+    if (rax < 0) {
+        errno = -rax;
+        rax = -1;
+    }
+    return rax;
+}
+
+int close(int fd) {
+    register int rax __asm__ ("rax") = __NR_close;
+    register int rdi __asm__ ("rdi") = fd;
+    __asm__ __volatile__ (
+        "syscall"
+        : "+r" (rax)
+        : "r" (rdi)
+        : "cc", "rcx", "r11", "memory"
+    );
+    if (rax < 0) {
+        errno = -rax;
+        rax = -1;
+    }
+    return rax;
+}
+
 _READ_WRITE_RETURN_TYPE write(int fd, const void* buf, size_t count) {
     register intptr_t rax __asm__ ("rax") = __NR_write;
     register int rdi __asm__ ("rdi") = fd;
