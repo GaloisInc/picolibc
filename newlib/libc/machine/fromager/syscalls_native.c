@@ -10,9 +10,14 @@
 
 
 // Indicate that the current trace is invalid.
-void __cc_flag_invalid(void) {}
+void __cc_flag_invalid(void) {
+    __cc_trace("INVALID");
+    _exit(1);
+}
 // Indicate that the current trace has exhibited a bug.
-void __cc_flag_bug(void) {}
+void __cc_flag_bug(void) {
+    __cc_trace("BUG");
+}
 
 // Print a message during evaluation in the MicroRAM interpreter.
 void __cc_trace(const char* msg) {
