@@ -75,3 +75,55 @@ uint32_t __llvm__ctpop__i32(uint32_t x) {
     x = (x & 0x0000ffff) + ((x & 0xffff0000) >> 16);
     return x;
 }
+
+int32_t __cc_sdiv_i32_i32(int32_t x, int32_t y) {
+    int32_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int32_t)((uint32_t)x / (uint32_t)y) * sign;
+}
+
+int32_t __cc_srem_i32_i32(int32_t x, int32_t y) {
+    int32_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int32_t)((uint32_t)x % (uint32_t)y) * sign;
+}
+
+int64_t __cc_sdiv_i64_i64(int64_t x, int64_t y) {
+    int64_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int64_t)((uint64_t)x / (uint64_t)y) * sign;
+}
+
+int64_t __cc_srem_i64_i64(int64_t x, int64_t y) {
+    int64_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int64_t)((uint64_t)x % (uint64_t)y) * sign;
+}
