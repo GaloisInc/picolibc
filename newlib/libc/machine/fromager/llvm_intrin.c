@@ -28,8 +28,33 @@ void __llvm__memmove__p0i8__p0i8__i64(uint8_t *dest, const uint8_t *src, uint64_
 }
 
 void __llvm__memset__p0i8__i64(uint8_t *dest, uint8_t val, uint64_t len) {
-    for (uint64_t i = 0; i < len; ++i) {
-        dest[i] = val;
+    if (len >= 4 * sizeof(uintptr_t)) {
+        uint8_t* dest_end = dest + len;
+        // Round `dest` up to the next multiple of the word size.
+        uint8_t* prefix = (uint8_t*)
+            (((uintptr_t)dest + sizeof(uintptr_t) - 1) & ~(sizeof(uintptr_t) - 1));
+        // Round `dest_end` down to the previous multiple of the word size.
+        uint8_t* suffix = (uint8_t*)((uintptr_t)dest_end & ~(sizeof(uintptr_t) - 1));
+
+        uintptr_t big_val = 0;
+        for (int i = 0; i < sizeof(uintptr_t); ++i) {
+            big_val = big_val | (val << (i * 8));
+        }
+
+        for (; dest != prefix; ++dest) {
+            *dest = val;
+        }
+        for (; dest != suffix; dest += sizeof(uintptr_t)) {
+            *(uintptr_t*)dest = big_val;
+        }
+        for (; dest != dest_end; ++dest) {
+            *dest = val;
+        }
+    } else {
+        uint8_t* dest_end = dest + len;
+        for (; dest != dest_end; ++dest) {
+            *dest = val;
+        }
     }
 }
 
