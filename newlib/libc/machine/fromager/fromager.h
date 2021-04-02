@@ -43,6 +43,17 @@ void* __cc_malloc_heap_end() __attribute__((noinline));
 void __cc_malloc_set_heap_end(void* new_end) __attribute__((noinline));
 void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinline));
 
+void __cc_trace_exec(
+        const char* name,
+        uintptr_t arg0,
+        uintptr_t arg1,
+        uintptr_t arg2,
+        uintptr_t arg3,
+        uintptr_t arg4,
+        uintptr_t arg5,
+        uintptr_t arg6,
+        uintptr_t arg7);
+
 #ifdef __cplusplus
 }
 #endif
