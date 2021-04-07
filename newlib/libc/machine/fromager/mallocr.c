@@ -52,7 +52,7 @@ void __cc_write_unchecked(uintptr_t* ptr, uintptr_t val);
 #ifdef DEFINE_MALLOC
 // Allocate a block of `size` bytes.
 char* malloc_internal(size_t size) {
-    char* ptr = __cc_malloc(size);
+    char* ptr = __cc_malloc(size + 2 * sizeof(uintptr_t));
 
     // Compute and validate the size of the allocation provided by the prover.
     uintptr_t addr = (uintptr_t)ptr;
