@@ -36,6 +36,7 @@ void __cc_malloc_init(void* addr) __attribute__((noinline)) {
     // No-op.  In `syscalls_native,c`, this is replaced with an `mmap` call.
 }
 
+/*
 void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinline)) {
     __cc_valid_if(addr == __cc_malloc_heap_start(),
         "heap snapshot was placed at the wrong location");
@@ -43,3 +44,4 @@ void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinl
         "heap has already been initialized");
     __cc_malloc_set_heap_end(addr + len);
 }
+*/

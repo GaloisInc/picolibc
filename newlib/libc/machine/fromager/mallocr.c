@@ -26,8 +26,16 @@ uintptr_t* __cc_advise_poison(char* start, char* end);
 // trace is invalid.
 void __cc_write_and_poison(uintptr_t* ptr, uintptr_t val);
 
+// Read a word from `*ptr`, bypassing normal memory safety checks.  This read
+// will never be considered a memory error.
+uintptr_t __cc_read_unchecked(uintptr_t* ptr);
 
-#define FROMAGER_SIMPLE_MALLOC
+// Write `val` to `*ptr`, bypassing normal memory safety checks.  This write
+// will never be considered a memory error.
+void __cc_write_unchecked(uintptr_t* ptr, uintptr_t val);
+
+
+//#define FROMAGER_SIMPLE_MALLOC
 
 
 #ifndef FROMAGER_SIMPLE_MALLOC
@@ -57,7 +65,7 @@ char* malloc_internal(size_t size) {
     __cc_write_and_poison(metadata, 1);
 
     size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
-    *size_ptr = size;
+    __cc_write_unchecked((uintptr_t*)size_ptr, (uintptr_t)size);
 
     // Choose a word to poison in the range `ptr .. metadata`.
     uintptr_t* poison = __cc_advise_poison(ptr + size, (char*)metadata);
@@ -134,7 +142,7 @@ void *realloc(void *ptr, size_t size) {
         "realloc'd pointer not the start of a region");
 
     size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
-    size_t old_size = *size_ptr;
+    size_t old_size = (size_t)__cc_read_unchecked((uintptr_t*)size_ptr);
 
     size_t copy_size = old_size < size ? old_size : size;
     void* new_ptr = malloc(size);
@@ -149,7 +157,6 @@ void *realloc(void *ptr, size_t size) {
 int posix_memalign(void **memptr, size_t alignment, size_t size) {
     // `malloc(N)` always returns a pointer that is aligned to the next power
     // of two >= `N`.
-    size_t adj_size = size;
     if (alignment > size) {
         size = alignment;
     }
