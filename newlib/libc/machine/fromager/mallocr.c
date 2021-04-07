@@ -44,7 +44,7 @@ uintptr_t __cc_read_unchecked(uintptr_t* ptr);
 void __cc_write_unchecked(uintptr_t* ptr, uintptr_t val);
 
 
-//#define FROMAGER_SIMPLE_MALLOC
+#define FROMAGER_SIMPLE_MALLOC
 
 
 #ifndef FROMAGER_SIMPLE_MALLOC
@@ -196,6 +196,13 @@ void* malloc(size_t size) {
 
 #ifdef DEFINE_FREE
 void free(void* ptr) {
+    if (ptr == NULL) {
+        return;
+    }
+
+    size_t size = (size_t)__cc_read_unchecked((uintptr_t*)(ptr - sizeof(uintptr_t)));
+    __cc_access_invalid(ptr, ptr + size);
+    // TODO: detect invalid free + double free
 }
 #endif
 
@@ -222,6 +229,9 @@ void *realloc(void *ptr, size_t size) {
 void __cc_malloc_init(void* addr) __attribute__((noinline));
 
 #define POS_INIT 0x100000000ul
+// Two words of padding, so there's always at least one well-aligned word
+// somewhere within the padding.
+#define MALLOC_PADDING 16
 
 static uintptr_t pos = 0;
 
@@ -248,14 +258,15 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) __attribute__((
         __cc_malloc_init((void*)pos);
     }
 
-    if (alignment < sizeof(size_t)) {
-        alignment = sizeof(size_t);
+    if (alignment < sizeof(uintptr_t)) {
+        alignment = sizeof(uintptr_t);
     }
 
-    pos += sizeof(size_t);
+    pos += sizeof(uintptr_t) + MALLOC_PADDING;
     pos = (pos + alignment - 1) & ~(alignment - 1);
     *memptr = (void*)pos;
-    *(size_t*)(pos - sizeof(size_t)) = size;
+    __cc_access_valid((char*)pos, (char*)pos + size);
+    __cc_write_unchecked((uintptr_t*)(pos - sizeof(uintptr_t)), (uintptr_t)size);
     pos += size;
     return 0;
 }
