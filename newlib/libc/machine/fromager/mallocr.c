@@ -17,6 +17,15 @@ char* __cc_malloc(size_t size);
 // Free the allocation starting at `ptr`.
 void __cc_free(char* ptr);
 
+// Mark the range from `start` to `end` as valid to access.  This overrides the
+// effect of any previous `__cc_mark_invalid` on the range.  All heap memory is
+// invalid to access by default; it must be marked with `__cc_access_valid`
+// when allocated.
+void __cc_access_valid(char* start, char* end);
+
+// Mark the range from `start` to `end` as invalid to access.
+void __cc_access_invalid(char* start, char* end);
+
 // Let the prover arbitrarily choose a word to poison in the range `start <=
 // ptr < end`.  The prover returns `NULL` to indicate that nothing should be
 // poisoned.
@@ -67,6 +76,8 @@ char* malloc_internal(size_t size) {
     size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
     __cc_write_unchecked((uintptr_t*)size_ptr, (uintptr_t)size);
 
+    __cc_access_valid(ptr, ptr + size);
+
     // Choose a word to poison in the range `ptr .. metadata`.
     uintptr_t* poison = __cc_advise_poison(ptr + size, (char*)metadata);
     if (poison != NULL) {
@@ -109,9 +120,9 @@ void free_internal(char* ptr) {
     // use-before-alloc bugs, which we catch by other means.
     (*ptr) = 0;
 
-    // We free only after the write, so the interpreter's fine-grained
-    // allocation tracking doesn't flag it as a use-after-free.
-    __cc_free(ptr);
+    size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
+    size_t size = (size_t)__cc_read_unchecked((uintptr_t*)size_ptr);
+    __cc_access_invalid(ptr, ptr + size);
 
     // Choose an address to poison.
     uintptr_t* metadata = (uintptr_t*)(ptr + region_size - 2 * sizeof(uintptr_t));
