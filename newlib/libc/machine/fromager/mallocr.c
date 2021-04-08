@@ -17,15 +17,6 @@ char* __cc_malloc(size_t size);
 // Free the allocation starting at `ptr`.
 void __cc_free(char* ptr);
 
-// Mark the range from `start` to `end` as valid to access.  This overrides the
-// effect of any previous `__cc_mark_invalid` on the range.  All heap memory is
-// invalid to access by default; it must be marked with `__cc_access_valid`
-// when allocated.
-void __cc_access_valid(char* start, char* end);
-
-// Mark the range from `start` to `end` as invalid to access.
-void __cc_access_invalid(char* start, char* end);
-
 // Let the prover arbitrarily choose a word to poison in the range `start <=
 // ptr < end`.  The prover returns `NULL` to indicate that nothing should be
 // poisoned.
@@ -34,14 +25,6 @@ uintptr_t* __cc_advise_poison(char* start, char* end);
 // Write `val` to `*ptr` and poison `*ptr`.  If `*ptr` is already poisoned, the
 // trace is invalid.
 void __cc_write_and_poison(uintptr_t* ptr, uintptr_t val);
-
-// Read a word from `*ptr`, bypassing normal memory safety checks.  This read
-// will never be considered a memory error.
-uintptr_t __cc_read_unchecked(uintptr_t* ptr);
-
-// Write `val` to `*ptr`, bypassing normal memory safety checks.  This write
-// will never be considered a memory error.
-void __cc_write_unchecked(uintptr_t* ptr, uintptr_t val);
 
 
 #define FROMAGER_SIMPLE_MALLOC

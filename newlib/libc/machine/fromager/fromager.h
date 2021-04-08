@@ -13,6 +13,25 @@ void __cc_flag_bug(void);
 // Print a message during evaluation in the MicroRAM interpreter.
 void __cc_trace(const char* msg);
 
+
+// Mark the range from `start` to `end` as valid to access.  This overrides the
+// effect of any previous `__cc_mark_invalid` on the range.  All heap memory is
+// invalid to access by default; it must be marked with `__cc_access_valid`
+// when allocated.
+void __cc_access_valid(char* start, char* end);
+
+// Mark the range from `start` to `end` as invalid to access.
+void __cc_access_invalid(char* start, char* end);
+
+// Read a word from `*ptr`, bypassing normal memory safety checks.  This read
+// will never be considered a memory error.
+uintptr_t __cc_read_unchecked(uintptr_t* ptr);
+
+// Write `val` to `*ptr`, bypassing normal memory safety checks.  This write
+// will never be considered a memory error.
+void __cc_write_unchecked(uintptr_t* ptr, uintptr_t val);
+
+
 // Assert that the trace is valid only if `cond` is non-zero.  If the trace is
 // invalid, `msg` will be printed when running in the MicroRAM interpreter.
 static inline void __cc_valid_if(int cond, const char* msg) {

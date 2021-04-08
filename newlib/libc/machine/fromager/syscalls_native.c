@@ -25,6 +25,18 @@ void __cc_trace(const char* msg) {
 }
 
 
+uintptr_t __cc_read_unchecked(uintptr_t* ptr) {
+    return *ptr;
+}
+
+void __cc_write_unchecked(uintptr_t* ptr, uintptr_t val) {
+    *ptr = val;
+}
+
+void __cc_access_valid(char* start, char* end) {}
+void __cc_access_invalid(char* start, char* end) {}
+
+
 void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
     register intptr_t rax __asm__ ("rax") = __NR_mmap;
     register void* rdi __asm__ ("rdi") = addr;
