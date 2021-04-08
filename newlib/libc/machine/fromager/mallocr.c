@@ -186,6 +186,7 @@ void free(void* ptr) {
     size_t size = (size_t)__cc_read_unchecked((uintptr_t*)(ptr - sizeof(uintptr_t)));
     __cc_access_invalid(ptr, ptr + size);
     // TODO: detect invalid free + double free
+    // TODO: poison freed memeory
 }
 #endif
 
@@ -245,12 +246,30 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) __attribute__((
         alignment = sizeof(uintptr_t);
     }
 
-    pos += sizeof(uintptr_t) + MALLOC_PADDING;
+    pos += sizeof(uintptr_t);
     pos = (pos + alignment - 1) & ~(alignment - 1);
     *memptr = (void*)pos;
     __cc_access_valid((char*)pos, (char*)pos + size);
     __cc_write_unchecked((uintptr_t*)(pos - sizeof(uintptr_t)), (uintptr_t)size);
     pos += size;
+
+    char* padding_start = (char*)pos;
+    pos += MALLOC_PADDING;
+    char* padding_end = (char*)pos;
+
+    uintptr_t* poison = __cc_advise_poison(padding_start, padding_end);
+    if (poison != NULL) {
+        // The poisoned address must be well-aligned.
+        __cc_valid_if((uintptr_t)poison % sizeof(uintptr_t) == 0,
+            "poison address is not word-aligned");
+        // The pointer must be somewhere within the freed region.
+        __cc_valid_if(padding_start <= (char*)poison,
+            "poisoned word extends before the padding region");
+        __cc_valid_if((char*)(poison + 1) <= padding_end,
+            "poisoned word extends after the padding region");
+        __cc_write_and_poison(poison, 0);
+    }
+
     return 0;
 }
 #endif
