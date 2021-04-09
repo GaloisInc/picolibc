@@ -215,7 +215,7 @@ void __cc_malloc_init(void* addr) __attribute__((noinline));
 #define POS_INIT 0x100000000ul
 // Two words of padding, so there's always at least one well-aligned word
 // somewhere within the padding.
-#define MALLOC_PADDING 16
+#define MALLOC_PADDING 64
 
 static uintptr_t pos = 0;
 
