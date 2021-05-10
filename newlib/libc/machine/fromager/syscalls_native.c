@@ -216,3 +216,46 @@ static FILE __stdout = FDEV_SETUP_STREAM(fromager_putchar, NULL, NULL, _FDEV_SET
 static FILE __stderr = FDEV_SETUP_STREAM(fromager_putchar_err, NULL, NULL, _FDEV_SETUP_WRITE);
 
 FILE *const __iob[3] = { &__stdin, &__stdout, &__stderr };
+
+
+void __cc_trace_exec(
+        const char* name,
+        uintptr_t arg0,
+        uintptr_t arg1,
+        uintptr_t arg2,
+        uintptr_t arg3,
+        uintptr_t arg4,
+        uintptr_t arg5,
+        uintptr_t arg6,
+        uintptr_t arg7) {
+    // Avoid infinite recursion.  `printf` gets instrumented, so
+    // `__cc_trace_exec` calls `printf` and `printf` calls `__cc_trace_exec`.
+    static int depth = 0;
+    if (depth > 0) {
+        return;
+    }
+    ++depth;
+
+    int count = 8;
+    if (count == 8 && arg7 == 0) { --count; }
+    if (count == 7 && arg6 == 0) { --count; }
+    if (count == 6 && arg5 == 0) { --count; }
+    if (count == 5 && arg4 == 0) { --count; }
+    if (count == 4 && arg3 == 0) { --count; }
+    if (count == 3 && arg2 == 0) { --count; }
+    if (count == 2 && arg1 == 0) { --count; }
+    if (count == 1 && arg0 == 0) { --count; }
+
+    printf("[FUNC] %s(", name);
+    if (count >= 1) { printf("%lx", arg0); }
+    if (count >= 2) { printf(", %lx", arg1); }
+    if (count >= 3) { printf(", %lx", arg2); }
+    if (count >= 4) { printf(", %lx", arg3); }
+    if (count >= 5) { printf(", %lx", arg4); }
+    if (count >= 6) { printf(", %lx", arg5); }
+    if (count >= 7) { printf(", %lx", arg6); }
+    if (count >= 8) { printf(", %lx", arg7); }
+    printf(")\n");
+
+    --depth;
+}
