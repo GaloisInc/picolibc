@@ -1,3 +1,14 @@
+// System calls and other low-level function implementations for the native
+// target.  This file is used instead of `syscalls.c` for native builds.  Since
+// native builds don't support MicroRAM compiler intrinsics, we must provide
+// alternate definitions of those here.
+//
+// Currently, we directly invoke Linux system calls for functions such as
+// `mmap` and `write`.  In the future, it might be possible to replace these
+// with calls to the system libc for better portability.  Of course, linking
+// two different libcs into a single binary isn't exactly a standard or
+// well-supported configuration, so this will require some linker tricks.
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

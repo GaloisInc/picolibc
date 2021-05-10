@@ -12,6 +12,9 @@
 #include <string.h>
 #include <fromager.h>
 
+// Specialized MicroRAM compiler intrinsics for memory allocation and memory
+// safety checking.
+
 // Allocate `size` bytes of memory.
 char* __cc_malloc(size_t size);
 // Free the allocation starting at `ptr`.
@@ -40,8 +43,8 @@ char* malloc_internal(size_t size) {
     // Compute and validate the size of the allocation provided by the prover.
     uintptr_t addr = (uintptr_t)ptr;
     size_t region_size = 1ull << ((addr >> 58) & 63);
-    // The allocated region must have space for `size` bytes, plus an
-    // additional word for metadata.
+    // The allocated region must have space for `size` bytes, plus two
+    // additional words for metadata.
     __cc_valid_if(region_size >= size + 2 * sizeof(uintptr_t),
         "allocated region size is too small");
     __cc_valid_if(addr % region_size == 0,
@@ -49,19 +52,26 @@ char* malloc_internal(size_t size) {
     // Note that `region_size` is always a power of two and is at least the
     // word size, so the address must be a multiple of the word size.
 
-    // Write 1 (allocated) to the metadata field, and poison it to prevent
+    // Write two words of metadata at the end of the allocated region.
+
+    // Write 1 (allocated) to the first metadata word, and poison it to prevent
     // tampering.  This will make the trace invalid if the metadata word is
     // already poisoned (this happens if the prover tries to return the same
     // region for two separate allocations).
     uintptr_t* metadata = (uintptr_t*)(ptr + region_size - 2 * sizeof(uintptr_t));
     __cc_write_and_poison(metadata, 1);
 
+    // Write the original size of the allocation to the second metadata word.
     size_t* size_ptr = (size_t*)(ptr + region_size - sizeof(uintptr_t));
     __cc_write_unchecked((uintptr_t*)size_ptr, (uintptr_t)size);
 
     __cc_access_valid(ptr, ptr + size);
 
     // Choose a word to poison in the range `ptr .. metadata`.
+    //
+    // FIXME: If the program touches only the second metadata word (the size
+    // field), then we can't catch that out-of-bounds access since there is no
+    // way to poison that word at the moment.
     uintptr_t* poison = __cc_advise_poison(ptr + size, (char*)metadata);
     if (poison != NULL) {
         // The poisoned address must be well-aligned.

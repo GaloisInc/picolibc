@@ -1,3 +1,6 @@
+// System calls and other low-level function implementations.  These are used
+// when running on the MicroRAM target.
+
 #include <sys/time.h>
 #include <sys/unistd.h>
 #include <unistd.h>
