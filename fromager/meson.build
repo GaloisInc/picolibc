@@ -3,6 +3,13 @@
 link_staticlib_bitcode = files('link_staticlib_bitcode.sh')
 
 foreach target : targets
+  value = get_variable('target_' + target)
+  instdir = join_paths(get_option('libdir'), value[0])
+
+  install_data('../scripts/fromager-link.sh',
+    install_dir: instdir,
+    install_mode: 'rwxr-xr-x')
+
   libc = get_variable('lib_c' + target)
 
   libc_bitcode = custom_target('libc_bitcode' + target,
@@ -23,4 +30,3 @@ foreach target : targets
     install: true,
     install_dir: instdir)
 endforeach
-
