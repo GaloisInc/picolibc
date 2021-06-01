@@ -127,3 +127,33 @@ int64_t __cc_srem_i64_i64(int64_t x, int64_t y) {
     }
     return (int64_t)((uint64_t)x % (uint64_t)y) * sign;
 }
+
+// We can't use va_list, so redefine it here.
+typedef struct {
+  unsigned int gp_offset;
+  unsigned int fp_offset;
+  void* overflow_arg_area;
+  void* reg_save_area;
+} __cc_va_list;
+
+void __cc_va_start(char* raw_list, char* bp, int offset) {
+    __cc_va_list* list = (__cc_va_list*) raw_list;
+
+    // Set gp_offset to 999.
+    list->gp_offset = 999;
+
+    // Set fp_offset to 999.
+    list->fp_offset = 999;
+
+    // Set overflow_arg_area to first variable argument.
+    list->overflow_arg_area = bp + offset;
+
+    // Set reg_save_area to 0xffff_0000.
+    list->reg_save_area = (void*) 0xffff0000;
+}
+
+void __cc_va_copy(char* dest, char* src) {
+    __cc_va_list* dest_list = (__cc_va_list*) dest;
+    __cc_va_list* src_list = (__cc_va_list*) src;
+    *dest_list = *src_list;
+}
