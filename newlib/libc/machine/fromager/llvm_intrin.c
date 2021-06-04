@@ -136,19 +136,20 @@ typedef struct {
   void* reg_save_area;
 } __cc_va_list;
 
+// The full discussion behind the implementation of `va_start` is available [here](https://gitlab-ext.galois.com/fromager/cheesecloth/MicroRAM/-/issues/48). `bp` and `offset` are used to compute the location of the first variable argument on the stack. `bp` is the base pointer and `offset` is the offset of the first variable argument relative to the base pointer.
 void __cc_va_start(char* raw_list, char* bp, int offset) {
     __cc_va_list* list = (__cc_va_list*) raw_list;
 
-    // Set gp_offset to 999.
+    // Set gp_offset to 999. The value 999 is larger than any legal offset, so that the va_arg code always uses the overflow_arg_area case for argument types that are normally passed in general-purpose registers.
     list->gp_offset = 999;
 
-    // Set fp_offset to 999.
+    // Set fp_offset to 999. Same as above, but for floating-point registers.
     list->fp_offset = 999;
 
-    // Set overflow_arg_area to first variable argument.
+    // Set overflow_arg_area to first variable argument on the stack.
     list->overflow_arg_area = bp + offset;
 
-    // Set reg_save_area to 0xffff_0000.
+    // Set reg_save_area to 0xffff_0000, which is an invalid but non-null pointer. This way accessing *(reg_save_area + offset) will be an out-of-bounds memory access for any reasonable offset.
     list->reg_save_area = (void*) 0xffff0000;
 }
 
