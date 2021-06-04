@@ -152,7 +152,7 @@ void __cc_va_start(char* raw_list, char* bp, int offset) {
     list->reg_save_area = (void*) 0xffff0000;
 }
 
-void __cc_va_copy(char* dest, char* src) {
+void __llvm__va_copy(char* dest, char* src) {
     __cc_va_list* dest_list = (__cc_va_list*) dest;
     __cc_va_list* src_list = (__cc_va_list*) src;
     *dest_list = *src_list;
