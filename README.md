@@ -1,3 +1,25 @@
+# Fromager Picolibc
+
+This is the FROMAGER fork of picolibc, used when building C programs for the
+MicroRAM architecture.
+
+## Buildng
+
+```sh
+mkdir build
+cd build
+../scripts/do-fromager-configure
+ninja install
+```
+
+This will "install" LLVM bitcode files into `build/image/picolibc/x86_64-unknown-fromager/lib/`.
+
+When changing `meson.build` files or the build configuration, it may be
+necessary to `rm -r build` and restart from scratch, as otherwise Meson can
+wrongly retain settings from the old configuration.  (Fortunately, picolibc
+builds very quickly.)
+
+
 # Picolibc
 Copyright © 2018-2021 Keith Packard
 
