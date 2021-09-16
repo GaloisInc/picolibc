@@ -140,6 +140,50 @@ typedef __socklen_t socklen_t;
 # define __socklen_t_defined
 #endif
 
+/* Give the socket FD the local address ADDR (which is LEN bytes long).  */
+extern int bind (int __fd, __CONST_SOCKADDR_ARG __addr, socklen_t __len)
+     __THROW;
+
+/* Prepare to accept connections on socket FD.
+   N connection requests will be queued before further requests are refused.
+   Returns 0 on success, -1 for errors.  */
+extern int listen (int __fd, int __n) __THROW;
+
+/* Read N bytes into BUF through socket FD.
+   If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
+   the sender, and store the actual size of the address in *ADDR_LEN.
+   Returns the number of bytes read or -1 for errors.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern ssize_t recvfrom (int __fd, void *__restrict __buf, size_t __n,
+			 int __flags, __SOCKADDR_ARG __addr,
+			 socklen_t *__restrict __addr_len);
+
+/* Send N bytes of BUF on socket FD to peer at address ADDR (which is
+   ADDR_LEN bytes long).  Returns the number sent, or -1 for errors.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern ssize_t sendto (int __fd, const void *__buf, size_t __n,
+		       int __flags, __CONST_SOCKADDR_ARG __addr,
+		       socklen_t __addr_len);
+
+/* Put the local address of FD into *ADDR and its length in *LEN.  */
+extern int getsockname (int __fd, __SOCKADDR_ARG __addr,
+			socklen_t *__restrict __len) __THROW;
+
+/* Await a connection on socket FD.
+   When a connection arrives, open a new socket to communicate with it,
+   set *ADDR (which is *ADDR_LEN bytes long) to the address of the connecting
+   peer and *ADDR_LEN to the address's actual length, and return the
+   new socket's descriptor, or -1 for errors.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern int accept (int __fd, __SOCKADDR_ARG __addr,
+		   socklen_t *__restrict __addr_len);
+
 /* Create a new socket of type TYPE in domain DOMAIN, using
    protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
    Returns a file descriptor for the new socket, or -1 for errors.  */
@@ -161,6 +205,19 @@ extern int shutdown (int __fd, int __how) __THROW;
    This function is a cancellation point and therefore not marked with
    __THROW.  */
 extern int connect (int __fd, __CONST_SOCKADDR_ARG __addr, socklen_t __len);
+
+/* Put the current value for socket FD's option OPTNAME at protocol level LEVEL
+   into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
+   actual length.  Returns 0 on success, -1 for errors.  */
+extern int getsockopt (int __fd, int __level, int __optname,
+		       void *__restrict __optval,
+		       socklen_t *__restrict __optlen) __THROW;
+
+/* Set socket FD's option OPTNAME at protocol level LEVEL
+   to *OPTVAL (which is OPTLEN bytes long).
+   Returns 0 on success, -1 for errors.  */
+extern int setsockopt (int __fd, int __level, int __optname,
+		       const void *__optval, socklen_t __optlen) __THROW;
 
 /* Types of sockets.  */
 enum __socket_type

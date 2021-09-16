@@ -126,21 +126,21 @@ struct hostent
 //    This function is a possible cancellation point and therefore not
 //    marked with __THROW.  */
 // extern struct hostent *gethostent (void);
-// 
-// /* Return entry from host data base which address match ADDR with
-//    length LEN and type TYPE.
-// 
-//    This function is a possible cancellation point and therefore not
-//    marked with __THROW.  */
-// extern struct hostent *gethostbyaddr (const void *__addr, __socklen_t __len,
-// 				      int __type);
-// 
-// /* Return entry from host data base for host with NAME.
-// 
-//    This function is a possible cancellation point and therefore not
-//    marked with __THROW.  */
-// extern struct hostent *gethostbyname (const char *__name);
-// 
+
+/* Return entry from host data base which address match ADDR with
+   length LEN and type TYPE.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern struct hostent *gethostbyaddr (const void *__addr, __socklen_t __len,
+				      int __type);
+
+/* Return entry from host data base for host with NAME.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern struct hostent *gethostbyname (const char *__name);
+
 // #ifdef __USE_MISC
 // /* Return entry from host data base for host with NAME.  AF must be
 //    set to the address type which is `AF_INET' for IPv4 or `AF_INET6'
@@ -279,14 +279,14 @@ struct servent
 //    This function is a possible cancellation point and therefore not
 //    marked with __THROW.  */
 // extern struct servent *getservent (void);
-// 
-// /* Return entry from network data base for network with NAME and
-//    protocol PROTO.
-// 
-//    This function is a possible cancellation point and therefore not
-//    marked with __THROW.  */
-// extern struct servent *getservbyname (const char *__name, const char *__proto);
-// 
+
+/* Return entry from network data base for network with NAME and
+   protocol PROTO.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern struct servent *getservbyname (const char *__name, const char *__proto);
+
 // /* Return entry from service data base which matches port PORT and
 //    protocol PROTO.
 // 
