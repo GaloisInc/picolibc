@@ -11,7 +11,8 @@ generated_names = [
   'fcntl',
   'mman',
   'netinet_in',
-  'socket'
+  'socket',
+  'sys_un'
 ]
 
 prog_python3 = import('python').find_installation('python3')

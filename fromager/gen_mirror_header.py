@@ -43,16 +43,6 @@ The allowed directives are:
   same size and offset in both structs.  If there are multiple definitions for
   the same struct name, the first one that matches will be emitted.
 
-  Each line should define a single field.  If the field definition is trivial
-  (such as `int x;`), then this script will detect the field name
-  automatically.  In cases where this fails, the line containing the field
-  definition should be prefixed with `@name`, as in `@a int a[10];`, to provide
-  the name of the field.  If the line begins with `@` without a name, then any
-  field name auto-detected on this line will be ignored.  And if the line
-  consists of only `@name` with no subsequent definition, then the field name
-  is recorded but nothing is emitted when giving the struct definition.  This
-  is useful for complex situations involving anonymous inner structs or unions.
-
 * `output_include header.h`: Add `#include <header.h>` to both the generator
   program and the header it generates.  This is mainly useful for including
   `stdint.h` or similar utility definitions in the generated header.  But since
@@ -61,6 +51,56 @@ The allowed directives are:
 
 * `output_guard NAME`: Use `NAME` as the name of the include guard for the
   generated header.
+
+
+### Struct field definitions
+
+The body of a `struct` directive must provide a list of C field declarations to
+define the struct body along with a list of field names to be checked against
+the host library's definition of the struct.  For simple structs, the name list
+is autodetected from the field declarations.  In more complex situations,
+attributes can be used for more fine-grained control over the body and the
+field names.
+
+Each attribute begins with an `@` and ends at the next space (or at end of
+line).  Attributes only affect the current line.
+
+* `@`: Disables automatic field name detection for this line.  No entry will be
+  added to the name list, unless a separate annotation adds one explicitly.
+* `@name`: Add `name` to the name list, and disable automatic field name
+  detection for the line.
+* `@name1=name2`: Map `name1` to `name2` in the name list.  When checking field
+  compatibility with the host library's version of the struct, field `name1` of
+  the host struct will be compared to field `name2` of the defined struct.
+* `@@check`: Include this line only in the generator program, for checking
+  against host definitions.
+* `@@emit`: Include this line only in the generated header.
+
+Examples:
+
+* `@sa_data char sa_data[14];` - The field name is set explicitly to `sa_data`,
+  since automated field name detection doesn't work when the name is followed
+  by an array specifier (`[14]`).
+
+* `@ unsigned char sin_zero[8];` - The `sin_zero` field is included in the
+  generated struct definition, but is not added to the field name list, so it
+  won't be checked for compatibility against any field of the host struct.
+  This is appropriate because the `sin_zero` field is used only for padding.
+
+* A multi-line definition:
+  ```
+  @@check @ uint8_t s6_addr_[16];
+  @@emit  @ uint8_t s6_addr[16];
+  @s6_addr=s6_addr_
+  ```
+  The field name `s6_addr` is actually a `#define` in glibc, so we can't
+  declare a field with that name in the generator program.  Instead we use the
+  name `s6_addr_` for compatibility checking.  The `@s6_addr=s6_addr_`
+  attribute means that the `s6_addr_` field will be checked against the
+  `s6_addr` field of the host struct.  Finally, when the generated header is
+  emitted, it will use the original `s6_addr` name, as required by the POSIX
+  standard.
+
 '''
 from collections import defaultdict, namedtuple
 import sys
@@ -93,20 +133,36 @@ def parse_directives(path):
 
 def parse_struct_body(lines):
     names = []
-    defs = []
+    check_body = []
+    emit_body = []
+
     for line in lines:
         line = line.strip();
         orig_line = line
 
         do_auto_name = True
+        only_check = False
+        only_emit = False
         while line.startswith('@'):
             attr, _, line = line.partition(' ')
             line = line.lstrip()
 
             assert attr.startswith('@')
-            if len(attr) > 1:
-                names.append(attr[1:])
-            do_auto_name = False
+            if attr.startswith('@@'):
+                a = attr[2:]
+                if a == 'check':
+                    only_check = True
+                elif a == 'emit':
+                    only_emit = True
+                else:
+                    assert False, 'unknown attribute %r in %r' % (a, orig_line)
+            else:
+                if len(attr) > 1:
+                    host, _, my = attr[1:].partition('=')
+                    if my == '':
+                        my = host
+                    names.append((host, my))
+                do_auto_name = False
 
         if do_auto_name:
             assert line.endswith(';'), \
@@ -114,11 +170,20 @@ def parse_struct_body(lines):
             name = line.rstrip(';').split()[-1]
             assert name.isidentifier(), \
                     'bad autodetected name %r in field def %r' % (name, orig_line)
-            names.append(name)
+            names.append((name, name))
 
-        defs.append(line)
+        assert not (only_check and only_emit), \
+                "can't combine @@check and @@emit (in %r)" % orig_line
 
-    return names, defs
+        if only_check:
+            check_body.append(line)
+        elif only_emit:
+            emit_body.append(line)
+        else:
+            check_body.append(line)
+            emit_body.append(line)
+
+    return names, check_body, emit_body
 
 def main():
     input_path, = sys.argv[1:]
@@ -150,13 +215,13 @@ def main():
 
     for name, ds in structs_by_name.items():
         for i, d in enumerate(ds):
-            names, defs = parse_struct_body(d.body)
+            names, check_lines, emit_lines = parse_struct_body(d.body)
             print('struct my_%s_%d {' % (name, i))
-            for line in defs:
+            for line in check_lines:
                 print('  ' + line)
             print('};')
 
-            struct_def_lines = ['struct %s {' % name] + defs + ['};']
+            struct_def_lines = ['struct %s {' % name] + emit_lines + ['};']
             print('const char* my_%s_%d_def =' % (name, i))
             for l in struct_def_lines:
                 escaped = l \
@@ -170,10 +235,10 @@ def main():
             print('  struct %s host;' % name)
             print('  struct my_%s_%d my;' % (name, i))
             print('  return COMPARE(sizeof(host), sizeof(my))')
-            for n in names:
-                print('    && COMPARE(sizeof(host.%s), sizeof(my.%s))' % (n, n))
+            for nh, nm in names:
+                print('    && COMPARE(sizeof(host.%s), sizeof(my.%s))' % (nh, nm))
                 print('    && COMPARE(offsetof(struct %s, %s), offsetof(struct my_%s_%d, %s))' %
-                        (name, n, name, i, n))
+                        (name, nh, name, i, nm))
             print('    ;')
             print('}')
 

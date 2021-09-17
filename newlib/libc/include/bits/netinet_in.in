@@ -7,13 +7,34 @@ include netinet/in.h
 struct in_addr
     uint32_t s_addr;
 
+struct in6_addr
+    # `s6_addr` is a macro in the host library, so we can't use it directly as
+    # a field name.
+    @@check @ uint8_t s6_addr_[16];
+    @@emit   @ uint8_t s6_addr[16];
+    @s6_addr=s6_addr_
+
 struct sockaddr_in
     uint16_t sin_family;
     uint16_t sin_port;
     struct in_addr sin_addr;
     @ unsigned char sin_zero[8];
 
+struct sockaddr_in6
+    uint16_t sin6_family;
+    uint16_t sin6_port;
+    uint32_t sin6_flowinfo;
+    struct in6_addr sin6_addr;
+    uint32_t sin6_scope_id;
+
+define IPPROTO_IP
+define IPPROTO_IPV6
+define IPPROTO_ICMP
+define IPPROTO_RAW
+define IPPROTO_TCP
+define IPPROTO_UDP
+
 define INADDR_ANY
 define INADDR_BROADCAST
 define INADDR_LOOPBACK
-    
+

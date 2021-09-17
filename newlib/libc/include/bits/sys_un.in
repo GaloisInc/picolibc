@@ -1,0 +1,8 @@
+output_guard BITS_SYS_UN_INCLUDED
+output_include stdint.h
+include sys/un.h
+
+struct sockaddr_un
+    uint16_t sun_family;
+    @sun_path char sun_path[108];
+
