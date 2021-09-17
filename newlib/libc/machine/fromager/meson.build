@@ -37,13 +37,17 @@ srcs_machine_syscalls_native = [
   'syscalls_native.c',
 ]
 
+srcs_machine_native = [
+  'cc_native.c',
+]
+
 foreach target : targets
 	value = get_variable('target_' + target)
 
 	static_library('machine_builtins' + target,
 		srcs_machine_builtins,
 		pic: false,
-		dependencies: [global_dep],
+        dependencies: [global_dep],
 		c_args: value[1] + ['-fno-builtin'],
         install: true,
         install_dir: instdir)
@@ -52,7 +56,7 @@ foreach target : targets
 		static_library('machine' + target,
 			srcs_machine,
 			pic: false,
-			dependencies: [global_dep],
+            dependencies: [global_dep],
 			c_args: value[1]))
 
     static_library('machine_syscalls' + target,
@@ -67,6 +71,13 @@ foreach target : targets
         srcs_machine_syscalls_native,
         pic: false,
         dependencies: [global_dep],
+        c_args: value[1],
+        install: true,
+        install_dir: instdir)
+
+    static_library('machine_native' + target,
+        srcs_machine_native,
+        pic: false,
         c_args: value[1],
         install: true,
         install_dir: instdir)

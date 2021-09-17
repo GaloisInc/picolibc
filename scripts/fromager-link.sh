@@ -154,9 +154,14 @@ do_build() {
         llvm-dis${LLVM_SUFFIX} "$work_dir/driver-full-nodebug.bc" -o "$cc_microram_output"
         sed -i -e 's/nofree//g' "$cc_microram_output"
     elif [[ "$mode" == "native" ]]; then
+        llvm-link${LLVM_SUFFIX} \
+            "$work_dir/driver-full-nodebug.bc" \
+            $(unpack_objects "$PICOLIBC_HOME/lib/libmachine_native.a") \
+            -o "$work_dir/driver-full-native.bc"
+
         clang++${LLVM_SUFFIX} \
             -o "$cc_native_output" \
-            "$work_dir/driver-full-nodebug.bc"
+            "$work_dir/driver-full-native.bc"
     fi
 }
 

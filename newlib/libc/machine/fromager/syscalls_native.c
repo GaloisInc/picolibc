@@ -15,9 +15,11 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/mman.h>
 #include <unistd.h>
 #include <errno.h>
 #include "fromager.h"
+#include "cc_native.h"
 
 
 // Indicate that the current trace is invalid.
@@ -58,120 +60,28 @@ void __cc_write_and_poison(uintptr_t* ptr, uintptr_t val) {
 
 
 void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
-    register intptr_t rax __asm__ ("rax") = __NR_mmap;
-    register void* rdi __asm__ ("rdi") = addr;
-    register size_t rsi __asm__ ("rsi") = length;
-    register int rdx __asm__ ("rdx") = prot;
-    register int r10 __asm__ ("r10") = flags;
-    register int r8 __asm__ ("r8") = fd;
-    register off_t r9 __asm__ ("r9") = offset;
-    __asm__ __volatile__ (
-        "syscall"
-        : "+r" (rax)
-        : "r" (rdi), "r" (rsi), "r" (rdx), "r" (r10), "r" (r8), "r" (r9)
-        : "cc", "rcx", "r11", "memory"
-    );
-    if (rax < 0) {
-        errno = -rax;
-        rax = -1;
-    }
-    return (void*)rax;
+    return cc_native_mmap(addr, length, prot, flags, fd, offset);
 }
 
 int open(const char* name, int flags, int mode) {
-    register int rax __asm__ ("rax") = __NR_open;
-    register const char* rdi __asm__ ("rdi") = name;
-    register int rsi __asm__ ("rsi") = flags;
-    register int rdx __asm__ ("rdx") = mode;
-    __asm__ __volatile__ (
-        "syscall"
-        : "+r" (rax)
-        : "r" (rdi), "r" (rsi), "r" (rdx)
-        : "cc", "rcx", "r11", "memory"
-    );
-    if (rax < 0) {
-        errno = -rax;
-        rax = -1;
-    }
-    return rax;
+    return cc_native_open(name, flags, mode);
 }
 
 int close(int fd) {
-    register int rax __asm__ ("rax") = __NR_close;
-    register int rdi __asm__ ("rdi") = fd;
-    __asm__ __volatile__ (
-        "syscall"
-        : "+r" (rax)
-        : "r" (rdi)
-        : "cc", "rcx", "r11", "memory"
-    );
-    if (rax < 0) {
-        errno = -rax;
-        rax = -1;
-    }
-    return rax;
+    return cc_native_close(fd);
 }
 
 _READ_WRITE_RETURN_TYPE write(int fd, const void* buf, size_t count) {
-    register intptr_t rax __asm__ ("rax") = __NR_write;
-    register int rdi __asm__ ("rdi") = fd;
-    register const void* rsi __asm__ ("rsi") = buf;
-    register size_t rdx __asm__ ("rdx") = count;
-    __asm__ __volatile__ (
-        "syscall"
-        : "+r" (rax)
-        : "r" (rdi), "r" (rsi), "r" (rdx)
-        : "cc", "rcx", "r11", "memory"
-    );
-    if (rax < 0) {
-        errno = -rax;
-        rax = -1;
-    }
-    return rax;
+    return cc_native_write(fd, buf, count);
 }
 
 _READ_WRITE_RETURN_TYPE read(int fd, void* buf, size_t count) {
-    register intptr_t rax __asm__ ("rax") = __NR_read;
-    register int rdi __asm__ ("rdi") = fd;
-    register void* rsi __asm__ ("rsi") = buf;
-    register size_t rdx __asm__ ("rdx") = count;
-    __asm__ __volatile__ (
-        "syscall"
-        : "+r" (rax)
-        : "r" (rdi), "r" (rsi), "r" (rdx)
-        : "cc", "rcx", "r11", "memory"
-    );
-    if (rax < 0) {
-        errno = -rax;
-        rax = -1;
-    }
-    return rax;
+    return cc_native_read(fd, buf, count);
 }
 
 void _exit(int status) {
-    register intptr_t rax __asm__ ("rax") = __NR_exit_group;
-    register int rdi __asm__ ("rdi") = status;
-    __asm__ __volatile__ (
-        "syscall"
-        : "+r" (rax)
-        : "r" (rdi)
-        : "cc", "rcx", "r11", "memory"
-    );
-    if (rax < 0) {
-        errno = -rax;
-        rax = -1;
-    }
-    for (;;) {}
+    cc_native_exit(status);
 }
-
-// Copied from bits/mman-linux.h
-#define PROT_READ	0x1		/* Page can be read.  */
-#define PROT_WRITE	0x2		/* Page can be written.  */
-#define PROT_EXEC	0x4		/* Page can be executed.  */
-#define MAP_SHARED	0x01		/* Share changes.  */
-#define MAP_PRIVATE	0x02		/* Changes are private.  */
-#define MAP_FIXED	0x10		/* Interpret addr exactly.  */
-#define MAP_ANONYMOUS	0x20		/* Don't use a file.  */
 
 void __cc_malloc_init(void* addr) __attribute__((noinline)) {
     void* addr2 = mmap(addr, 64 * 1024 * 1024, PROT_READ | PROT_WRITE,
