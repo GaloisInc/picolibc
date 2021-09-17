@@ -134,6 +134,7 @@ def main():
 
     print('#include <stdlib.h>')
     print('#include <stdio.h>')
+    print('#include <stddef.h>')
     for d in directives_by_kind['include']:
         print('#include <%s>' % d.name)
     for d in directives_by_kind['output_include']:

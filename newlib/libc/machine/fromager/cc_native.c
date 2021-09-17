@@ -1,4 +1,9 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/mman.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include "cc_native.h"
 
@@ -26,3 +31,19 @@ void cc_native_exit(int status) {
     exit(status);
 }
 
+
+int cc_native_socket(int domain, int type, int protocol) {
+    return socket(domain, type, protocol);
+}
+
+int cc_native_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    return bind(sockfd, addr, addrlen);
+}
+
+int cc_native_listen(int sockfd, int backlog) {
+    return listen(sockfd, backlog);
+}
+
+int cc_native_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    return accept(sockfd, addr, addrlen);
+}

@@ -13,11 +13,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
-#include <sys/mman.h>
 #include <unistd.h>
-#include <errno.h>
 #include "fromager.h"
 #include "cc_native.h"
 
@@ -63,7 +65,14 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
     return cc_native_mmap(addr, length, prot, flags, fd, offset);
 }
 
-int open(const char* name, int flags, int mode) {
+int open(const char* name, int flags, ...) {
+    int mode = 0;
+    if (flags & O_CREAT) {
+        va_list va;
+        va_start(va, flags);
+        mode = va_arg(va, mode_t);
+        va_end(va);
+    }
     return cc_native_open(name, flags, mode);
 }
 
@@ -126,6 +135,23 @@ static FILE __stdout = FDEV_SETUP_STREAM(fromager_putchar, NULL, NULL, _FDEV_SET
 static FILE __stderr = FDEV_SETUP_STREAM(fromager_putchar_err, NULL, NULL, _FDEV_SETUP_WRITE);
 
 FILE *const __iob[3] = { &__stdin, &__stdout, &__stderr };
+
+
+int socket(int domain, int type, int protocol) {
+    return cc_native_socket(domain, type, protocol);
+}
+
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    return cc_native_bind(sockfd, addr, addrlen);
+}
+
+int listen(int sockfd, int backlog) {
+    return cc_native_listen(sockfd, backlog);
+}
+
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    return cc_native_accept(sockfd, addr, addrlen);
+}
 
 
 void __cc_trace_exec(

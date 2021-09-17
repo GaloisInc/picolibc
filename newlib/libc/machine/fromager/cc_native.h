@@ -10,3 +10,7 @@ ssize_t cc_native_read(int fd, void* buf, size_t count);
 
 void cc_native_exit(int status) __attribute__((noreturn));
 
+int cc_native_socket(int domain, int type, int protocol);
+int cc_native_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int cc_native_listen(int sockfd, int backlog);
+int cc_native_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);

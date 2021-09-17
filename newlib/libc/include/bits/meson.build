@@ -9,7 +9,9 @@ install_headers(inc_headers,
 
 generated_names = [
   'fcntl',
-  'mman'
+  'mman',
+  'netinet_in',
+  'socket'
 ]
 
 prog_python3 = import('python').find_installation('python3')
