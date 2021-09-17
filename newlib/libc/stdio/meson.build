@@ -296,6 +296,6 @@ foreach target : targets
 		static_library('stdio' + target,
 			srcs_stdio_use,
 			pic: false,
-			include_directories: inc,
+			dependencies: [global_dep],
 			c_args: value[1]))
 endforeach

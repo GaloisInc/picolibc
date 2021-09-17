@@ -56,6 +56,6 @@ foreach target : targets
 		static_library('reent' + target,
 			srcs_reent_use,
 			pic: false,
-			include_directories: inc,
+			dependencies: [global_dep],
 			c_args: value[1]))
 endforeach

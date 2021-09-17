@@ -63,6 +63,6 @@ foreach target : targets
 		static_library('search' + target,
 			srcs_search,
 			pic: false,
-			include_directories: inc,
+			dependencies: [global_dep],
 			c_args: value[1]))
 endforeach

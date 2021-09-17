@@ -260,7 +260,7 @@ foreach target : targets
 		     static_library('stdlib_malloc' + target,
 				    srcs_stdlib_malloc_use,
 				    pic: false,
-				    include_directories: inc,
+				    dependencies: [global_dep],
 				    c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
 	lib_stdlib_malloc_objs = get_variable('lib_stdlib_malloc' + target).extract_all_objects(recursive:true)
 	
@@ -269,6 +269,6 @@ foreach target : targets
 				    srcs_stdlib_use,
 				    objects: lib_stdlib_malloc_objs,
 				    pic: false,
-				    include_directories: inc,
+				    dependencies: [global_dep],
 				    c_args: value[1] + ['-DINTERNAL_NEWLIB']))
 endforeach

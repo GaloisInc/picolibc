@@ -43,7 +43,7 @@ foreach target : targets
 	static_library('machine_builtins' + target,
 		srcs_machine_builtins,
 		pic: false,
-		include_directories: inc,
+		dependencies: [global_dep],
 		c_args: value[1] + ['-fno-builtin'],
         install: true,
         install_dir: instdir)
@@ -52,13 +52,13 @@ foreach target : targets
 		static_library('machine' + target,
 			srcs_machine,
 			pic: false,
-			include_directories: inc,
+			dependencies: [global_dep],
 			c_args: value[1]))
 
     static_library('machine_syscalls' + target,
         srcs_machine_syscalls,
         pic: false,
-        include_directories: inc,
+        dependencies: [global_dep],
         c_args: value[1],
         install: true,
         install_dir: instdir)
@@ -66,7 +66,7 @@ foreach target : targets
     static_library('machine_syscalls_native' + target,
         srcs_machine_syscalls_native,
         pic: false,
-        include_directories: inc,
+        dependencies: [global_dep],
         c_args: value[1],
         install: true,
         install_dir: instdir)
