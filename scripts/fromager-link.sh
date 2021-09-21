@@ -131,7 +131,7 @@ do_build() {
         --internalize --internalize-public-api-list="$keep_symbols" \
         $instrument_args \
         --force-vector-width=1 \
-        -O3 --scalarizer -O1 \
+        -O3 --unroll-vectors -O1 \
         $strip_debug_args \
         "$work_dir/driver-nosecret.bc" \
         -o "$work_dir/driver-nosecret-opt.bc"
