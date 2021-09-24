@@ -73,19 +73,50 @@ int open(const char* name, int flags, ...) {
         mode = va_arg(va, mode_t);
         va_end(va);
     }
-    return cc_native_open(name, flags, mode);
+    printf("RECORDING: open(%p, %d, %d)", name, flags, mode);
+    int ret = cc_native_open(name, flags, mode);
+    printf(" = %d\n", ret);
+    return ret;
 }
 
 int close(int fd) {
-    return cc_native_close(fd);
+    printf("RECORDING: close(%d)", fd);
+    int ret = cc_native_close(fd);
+    printf(" = %d\n", ret);
+    return ret;
 }
 
 _READ_WRITE_RETURN_TYPE write(int fd, const void* buf, size_t count) {
-    return cc_native_write(fd, buf, count);
+    // printf("RECORDING: write(%d, %p, %d)", fd, buf, count);
+    int ret = cc_native_write(fd, buf, count);
+    // printf(" = %d\n", ret);
+    return ret;
+}
+
+void print_buf(void* buf, int count) {
+    printf("{\n  ");
+    for (int z=0; z<count; z++) {
+        printf("0x%02X",((uint8_t*) buf)[z]);
+        if (z + 1 == count) {
+            printf("\n};\n");
+        }
+        else if ((z+1)%16 == 0) {
+            printf(",\n  ");
+        }
+        else {
+            printf(", ");
+        }
+    }
 }
 
 _READ_WRITE_RETURN_TYPE read(int fd, void* buf, size_t count) {
-    return cc_native_read(fd, buf, count);
+    printf("RECORDING: read(%d, %p, %d)", fd, buf, count);
+    int ret = cc_native_read(fd, buf, count);
+    printf(" = %d\n", ret);
+    static int num = 0;
+    printf("unsigned char read_buf_%d[%d] = ", num++, ret);
+    print_buf(buf, ret);
+    return ret;
 }
 
 void _exit(int status) {
@@ -138,19 +169,31 @@ FILE *const __iob[3] = { &__stdin, &__stdout, &__stderr };
 
 
 int socket(int domain, int type, int protocol) {
-    return cc_native_socket(domain, type, protocol);
+    printf("RECORDING: socket(%d,%d,%d)", domain, type, protocol);
+    int ret = cc_native_socket(domain, type, protocol);
+    printf(" = %d\n", ret);
+    return ret;
 }
 
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
-    return cc_native_bind(sockfd, addr, addrlen);
+    printf("RECORDING: bind(%d,%d,%d)", sockfd, addr->sa_family, addrlen); // TODO: Log full addr.
+    int ret = cc_native_bind(sockfd, addr, addrlen);
+    printf(" = %d\n", ret);
+    return ret;
 }
 
 int listen(int sockfd, int backlog) {
-    return cc_native_listen(sockfd, backlog);
+    printf("RECORDING: listen(%d,%d)", sockfd, backlog);
+    int ret = cc_native_listen(sockfd, backlog);
+    printf(" = %d\n", ret);
+    return ret;
 }
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
-    return cc_native_accept(sockfd, addr, addrlen);
+    printf("RECORDING: accept(%d,%d,%d)", sockfd, addr->sa_family, addrlen); // TODO: Log full addr.
+    int ret = cc_native_accept(sockfd, addr, addrlen);
+    printf(" = %d\n", ret);
+    return ret;
 }
 
 
