@@ -72,6 +72,7 @@ inc_headers = [
   'memory.h',
   'newlib.h',
   'netdb.h',
+  'noni.h',
   'paths.h',
   'poll.h',
   'pwd.h',

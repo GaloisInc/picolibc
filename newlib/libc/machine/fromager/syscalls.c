@@ -7,8 +7,16 @@
 #include <sys/unistd.h>
 #include <unistd.h>
 #include "fromager.h"
+#include "noni.h"
+
+// Initialize the label to `bottom`.
+label cc_current_label = bottom;
 
 _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
+    // JP: Do we need to mark the sink earlier in OpenSSL code?
+    for (size_t i = 0; i < nbyte; i++) {
+        noniSinkU8(((uint8_t*) buf)+i, cc_current_label);
+    }
     return nbyte;
 }
 

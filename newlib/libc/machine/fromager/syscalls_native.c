@@ -22,6 +22,26 @@
 #include <unistd.h>
 #include "fromager.h"
 #include "cc_native.h"
+#include "noni.h"
+
+// No ops for taint analysis.
+label cc_current_label = bottom;
+void noniSetLabelU8( uint8_t* p, label l) {}
+void noniSinkU8( uint8_t* p, label l) {}
+void noniSetLabelI8( int8_t* p, label l) {}
+void noniSinkI8( int8_t* p, label l) {}
+void noniSetLabelU16( uint16_t* p, label l) {}
+void noniSinkU16( uint16_t* p, label l) {}
+void noniSetLabelI16( int16_t* p, label l) {}
+void noniSinkI16( int16_t* p, label l) {}
+void noniSetLabelU32( uint32_t* p, label l) {}
+void noniSinkU32( uint32_t* p, label l) {}
+void noniSetLabelI32( int32_t* p, label l) {}
+void noniSinkI32( int32_t* p, label l) {}
+void noniSetLabelU64( uint64_t* p, label l) {}
+void noniSinkU64( uint64_t* p, label l) {}
+void noniSetLabelI64( int64_t* p, label l) {}
+void noniSinkI64( int64_t* p, label l) {}
 
 
 // Indicate that the current trace is invalid.
