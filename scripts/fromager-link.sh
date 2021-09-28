@@ -146,6 +146,8 @@ do_build() {
     keep_symbols=$keep_symbols,__cc_srem_i32_i32
     keep_symbols=$keep_symbols,__cc_sdiv_i64_i64
     keep_symbols=$keep_symbols,__cc_srem_i64_i64
+    keep_symbols=$keep_symbols,__cc_va_start
+    keep_symbols=$keep_symbols,__llvm__va_copy
     if [[ "$mode" == "native" ]]; then
         # Explicitly preserve some libm symbols.  `globaldce` can't see the connection
         # between `llvm.floor.f64` and `floor` and will wrongly remove the latter.
