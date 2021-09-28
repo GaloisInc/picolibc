@@ -108,19 +108,35 @@ do_build() {
     local mode="$1"
     echo "build: $mode"
 
+    local work_dir="$cc_build_dir/link_$mode"
+    mkdir -p "$work_dir"
+
+    if [[ "$mode" == "microram" ]]; then
+        # libmachine_builtins.a has already been optimized.  Further
+        # optimization after linking risks replacing function bodies with
+        # calls to the very LLVM intrinsic that the function is defining,
+        # causing infinite recursion.
+        llvm-link${LLVM_SUFFIX} \
+            $(unpack_objects "$PICOLIBC_HOME/lib/libmachine_builtins.a") \
+            -o "$work_dir/builtins-orig.bc"
+
+        opt${LLVM_SUFFIX} \
+            -load "$LLVM_PASSES_HOME/passes.so" \
+            "$work_dir/builtins-orig.bc" \
+            --cc-set-intrinsic-attrs \
+            -o "$work_dir/builtins-optnone.bc"
+    fi
+
     local extra_link=""
     local extra_post_link=""
     if [[ "$mode" == "microram" ]]; then
-        extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls.a $PICOLIBC_HOME/lib/libmachine_builtins.a"
+        extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls.a $work_dir/builtins-optnone.bc"
     elif [[ "$mode" == "native" ]]; then
         extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls_native.a"
     else
         echo "bad mode: $mode"
         return 1
     fi
-
-    local work_dir="$cc_build_dir/link_$mode"
-    mkdir -p "$work_dir"
 
     # Link in the libraries prior to optimizing.  We don't add the driver secrets
     # yet, so the optimizer won't propagate information about them.
