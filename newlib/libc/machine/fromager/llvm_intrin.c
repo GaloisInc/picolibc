@@ -79,7 +79,7 @@ uint32_t __llvm__ctlz__i32(uint32_t x, int is_zero_undef) {
 }
 
 uint64_t __llvm__ctlz__i64(uint64_t x, int is_zero_undef) {
-  return __clzsi2(x);
+  return __clzdi2(x);
 }
 
 uint32_t __llvm__cttz__i32(uint32_t x, int is_zero_undef) {
@@ -87,7 +87,7 @@ uint32_t __llvm__cttz__i32(uint32_t x, int is_zero_undef) {
 }
 
 uint64_t __llvm__cttz__i64(uint64_t x, int is_zero_undef) {
-  return __ctzsi2(x);
+  return __ctzdi2(x);
 }
 
 
