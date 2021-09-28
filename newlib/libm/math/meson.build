@@ -170,7 +170,7 @@ l_srcs_math = [
     'el_hypot.c',
   ]
 
-if have_long_double
+if libm_long_double and have_long_double
   srcs_math += l_srcs_math
 endif
 

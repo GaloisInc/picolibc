@@ -62,6 +62,9 @@ option('sysroot-install', type: 'boolean', value: false,
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
 
+option('libm-long-double', type: 'boolean', value: true,
+       description: 'enable long double type support in libm functions')
+
 #
 # Testing options
 #
@@ -102,6 +105,8 @@ option('posix-io', type: 'boolean', value: true,
        description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
+option('io-long-double', type: 'boolean', value: true,
+       description: 'enable long double type support in tinystdio functions')
 
 #
 # Options applying to only legacy stdio

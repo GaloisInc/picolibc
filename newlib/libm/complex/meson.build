@@ -118,7 +118,7 @@ lsrc_complex_long_double_equal_double = [
 
 srcs_complex = dsrc_complex + fsrc_complex
 
-if have_long_double
+if libm_long_double and have_long_double
   if long_double_equals_double
     lsrc_complex += lsrc_complex_long_double_equal_double
   endif
