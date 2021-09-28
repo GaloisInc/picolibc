@@ -50,6 +50,31 @@ if [[ -z "$cc_keep_debug" ]]; then
 fi
 
 PICOLIBC_HOME="$(dirname "$0")/.."
+CHEESECLOTH_HOME="$PICOLIBC_HOME/../../../../.."
+if [ -z "$COMPILER_RT_HOME" ]; then
+    # Guess compiler-rt location
+    COMPILER_RT_HOME="$CHEESECLOTH_HOME/llvm-project/compiler-rt/build"
+    echo "guessed $(readlink -f "$COMPILER_RT_HOME")"
+fi
+if [ -z "$LLVM_PASSES_HOME" ]; then
+    LLVM_PASSES_HOME="$CHEESECLOTH_HOME/llvm-passes"
+    echo "guessed $(readlink -f "$LLVM_PASSES_HOME")"
+fi
+
+case "$(uname)" in
+    Linux)
+        compiler_rt_lib="$COMPILER_RT_HOME/lib/linux/libclang_rt.builtins-x86_64.a"
+        ;;
+    *)
+        echo "don't know how to find compiler-rt library for $(uname) platform"
+        exit 1
+        ;;
+esac
+
+if ! [ -f "$compiler_rt_lib" ]; then
+    echo "failed to find runtime library: $compiler_rt_lib is not a file"
+    exit 1
+fi
 
 unpack_objects() {
     for f in "$@"; do
@@ -105,6 +130,7 @@ do_build() {
         $(unpack_objects $PICOLIBC_HOME/lib/libm.a) \
         $(unpack_objects $extra_link) \
         $(unpack_objects $cc_objects) \
+        $(unpack_objects $compiler_rt_lib) \
         -o "$work_dir/driver-nosecret.bc"
 
     keep_symbols=main
@@ -127,11 +153,11 @@ do_build() {
 
     # Optimize, removing unused public symbols
     opt${LLVM_SUFFIX} \
-        -load ../llvm-passes/passes.so \
+        -load "$LLVM_PASSES_HOME/passes.so" \
         --internalize --internalize-public-api-list="$keep_symbols" \
         $instrument_args \
-        --force-vector-width=1 \
-        -O3 --scalarizer -O1 \
+        --scalarizer --unroll-vectors --soft-float \
+        -O3 --scalarizer --unroll-vectors -O1 \
         $strip_debug_args \
         "$work_dir/driver-nosecret.bc" \
         -o "$work_dir/driver-nosecret-opt.bc"
