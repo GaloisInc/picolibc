@@ -111,8 +111,7 @@ do_build() {
     local extra_link=""
     local extra_post_link=""
     if [[ "$mode" == "microram" ]]; then
-        extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls.a"
-        extra_post_link="$PICOLIBC_HOME/lib/libmachine_builtins.a"
+        extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls.a $PICOLIBC_HOME/lib/libmachine_builtins.a"
     elif [[ "$mode" == "native" ]]; then
         extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls_native.a"
     else
@@ -139,6 +138,10 @@ do_build() {
     keep_symbols=$keep_symbols,__llvm__memset__p0i8__i64
     keep_symbols=$keep_symbols,__llvm__bswap__i32
     keep_symbols=$keep_symbols,__llvm__ctpop__i32
+    keep_symbols=$keep_symbols,__llvm__ctlz__i32
+    keep_symbols=$keep_symbols,__llvm__ctlz__i64
+    keep_symbols=$keep_symbols,__llvm__cttz__i32
+    keep_symbols=$keep_symbols,__llvm__cttz__i64
     keep_symbols=$keep_symbols,__cc_sdiv_i32_i32
     keep_symbols=$keep_symbols,__cc_srem_i32_i32
     keep_symbols=$keep_symbols,__cc_sdiv_i64_i64
