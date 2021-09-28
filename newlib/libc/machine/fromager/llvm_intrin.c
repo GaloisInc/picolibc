@@ -91,26 +91,57 @@ uint64_t __llvm__cttz__i64(uint64_t x, int is_zero_undef) {
 }
 
 
-int __divsi3(int a, int b);
 int32_t __cc_sdiv_i32_i32(int32_t x, int32_t y) {
-  return __divsi3(x, y);
+    int32_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int32_t)((uint32_t)x / (uint32_t)y) * sign;
 }
 
-int __modsi3(int a, int b);
 int32_t __cc_srem_i32_i32(int32_t x, int32_t y) {
-  return __modsi3(x, y);
+    int32_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int32_t)((uint32_t)x % (uint32_t)y) * sign;
 }
 
-long __divdi3(long a, long b);
 int64_t __cc_sdiv_i64_i64(int64_t x, int64_t y) {
-  return __divdi3(x, y);
+    int64_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int64_t)((uint64_t)x / (uint64_t)y) * sign;
 }
 
-long __moddi3(long a, long b);
 int64_t __cc_srem_i64_i64(int64_t x, int64_t y) {
-  return __moddi3(x, y);
+    int64_t sign = 1;
+    if (x < 0) {
+        x = -x;
+        sign = -sign;
+    }
+    if (y < 0) {
+        y = -y;
+        sign = -sign;
+    }
+    return (int64_t)((uint64_t)x % (uint64_t)y) * sign;
 }
-
 
 
 // We can't use va_list, so redefine it here.
