@@ -50,6 +50,31 @@ if [[ -z "$cc_keep_debug" ]]; then
 fi
 
 PICOLIBC_HOME="$(dirname "$0")/.."
+CHEESECLOTH_HOME="$PICOLIBC_HOME/../../../../.."
+if [ -z "$COMPILER_RT_HOME" ]; then
+    # Guess compiler-rt location
+    COMPILER_RT_HOME="$CHEESECLOTH_HOME/llvm-project/compiler-rt/build"
+    echo "guessed $(readlink -f "$COMPILER_RT_HOME")"
+fi
+if [ -z "$LLVM_PASSES_HOME" ]; then
+    LLVM_PASSES_HOME="$CHEESECLOTH_HOME/llvm-passes"
+    echo "guessed $(readlink -f "$LLVM_PASSES_HOME")"
+fi
+
+case "$(uname)" in
+    Linux)
+        compiler_rt_lib="$COMPILER_RT_HOME/lib/linux/libclang_rt.builtins-x86_64.a"
+        ;;
+    *)
+        echo "don't know how to find compiler-rt library for $(uname) platform"
+        exit 1
+        ;;
+esac
+
+if ! [ -f "$compiler_rt_lib" ]; then
+    echo "failed to find runtime library: $compiler_rt_lib is not a file"
+    exit 1
+fi
 
 unpack_objects() {
     for f in "$@"; do
@@ -83,20 +108,35 @@ do_build() {
     local mode="$1"
     echo "build: $mode"
 
+    local work_dir="$cc_build_dir/link_$mode"
+    mkdir -p "$work_dir"
+
+    if [[ "$mode" == "microram" ]]; then
+        # libmachine_builtins.a has already been optimized.  Further
+        # optimization after linking risks replacing function bodies with
+        # calls to the very LLVM intrinsic that the function is defining,
+        # causing infinite recursion.
+        llvm-link${LLVM_SUFFIX} \
+            $(unpack_objects "$PICOLIBC_HOME/lib/libmachine_builtins.a") \
+            -o "$work_dir/builtins-orig.bc"
+
+        opt${LLVM_SUFFIX} \
+            -load "$LLVM_PASSES_HOME/passes.so" \
+            "$work_dir/builtins-orig.bc" \
+            --cc-set-intrinsic-attrs \
+            -o "$work_dir/builtins-optnone.bc"
+    fi
+
     local extra_link=""
     local extra_post_link=""
     if [[ "$mode" == "microram" ]]; then
-        extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls.a"
-        extra_post_link="$PICOLIBC_HOME/lib/libmachine_builtins.a"
+        extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls.a $work_dir/builtins-optnone.bc"
     elif [[ "$mode" == "native" ]]; then
         extra_link="$PICOLIBC_HOME/lib/libmachine_syscalls_native.a"
     else
         echo "bad mode: $mode"
         return 1
     fi
-
-    local work_dir="$cc_build_dir/link_$mode"
-    mkdir -p "$work_dir"
 
     # Link in the libraries prior to optimizing.  We don't add the driver secrets
     # yet, so the optimizer won't propagate information about them.
@@ -105,6 +145,7 @@ do_build() {
         $(unpack_objects $PICOLIBC_HOME/lib/libm.a) \
         $(unpack_objects $extra_link) \
         $(unpack_objects $cc_objects) \
+        $(unpack_objects $compiler_rt_lib) \
         -o "$work_dir/driver-nosecret.bc"
 
     keep_symbols=main
@@ -113,10 +154,16 @@ do_build() {
     keep_symbols=$keep_symbols,__llvm__memset__p0i8__i64
     keep_symbols=$keep_symbols,__llvm__bswap__i32
     keep_symbols=$keep_symbols,__llvm__ctpop__i32
+    keep_symbols=$keep_symbols,__llvm__ctlz__i32
+    keep_symbols=$keep_symbols,__llvm__ctlz__i64
+    keep_symbols=$keep_symbols,__llvm__cttz__i32
+    keep_symbols=$keep_symbols,__llvm__cttz__i64
     keep_symbols=$keep_symbols,__cc_sdiv_i32_i32
     keep_symbols=$keep_symbols,__cc_srem_i32_i32
     keep_symbols=$keep_symbols,__cc_sdiv_i64_i64
     keep_symbols=$keep_symbols,__cc_srem_i64_i64
+    keep_symbols=$keep_symbols,__cc_va_start
+    keep_symbols=$keep_symbols,__llvm__va_copy
     if [[ "$mode" == "native" ]]; then
         # Explicitly preserve some libm symbols.  `globaldce` can't see the connection
         # between `llvm.floor.f64` and `floor` and will wrongly remove the latter.
@@ -127,10 +174,11 @@ do_build() {
 
     # Optimize, removing unused public symbols
     opt${LLVM_SUFFIX} \
-        -load ../llvm-passes/passes.so \
+        -load "$LLVM_PASSES_HOME/passes.so" \
         --internalize --internalize-public-api-list="$keep_symbols" \
         $instrument_args \
         --force-vector-width=1 \
+        --scalarizer --unroll-vectors --soft-float \
         -O3 --scalarizer --unroll-vectors -O1 \
         $strip_debug_args \
         "$work_dir/driver-nosecret.bc" \

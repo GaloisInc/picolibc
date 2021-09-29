@@ -227,7 +227,7 @@ lsrc_wrap = [
 
 srcs_common = src_common + dsrc_common + fsrc_common
 
-if have_long_double
+if libm_long_double and have_long_double
   srcs_common += lsrc_full
   if long_double_equals_double
     srcs_common += lsrc_wrap

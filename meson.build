@@ -117,6 +117,9 @@ endif
 # Select exit code
 picoexit = get_option('picoexit')
 
+# libm options
+libm_long_double = get_option('libm-long-double')
+
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 newlib_tinystdio = get_option('newlib-tinystdio')
@@ -160,6 +163,7 @@ endif
 posix_io = tinystdio and get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
+io_long_double = not tinystdio or get_option('io-long-double')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 
 # A bunch of newlib-stdio only options

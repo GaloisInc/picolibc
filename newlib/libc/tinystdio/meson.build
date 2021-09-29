@@ -129,7 +129,7 @@ else
   srcs_tinystdio += srcs_dtoa_float
 endif
 
-if have_long_double and not long_double_equals_double
+if io_long_double and have_long_double and not long_double_equals_double
   srcs_tinystdio += ['strtold.c', 'strtold_l.c']
 endif
 
