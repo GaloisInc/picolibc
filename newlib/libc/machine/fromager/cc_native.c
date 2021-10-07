@@ -31,6 +31,13 @@ void cc_native_exit(int status) {
     exit(status);
 }
 
+int cc_native_shutdown(int sockfd, int how) {
+    return shutdown(sockfd, how);
+}
+
+off_t cc_native_lseek(int fd, off_t offset, int whence) {
+    return lseek(fd, offset, whence);
+}
 
 int cc_native_socket(int domain, int type, int protocol) {
     return socket(domain, type, protocol);
@@ -46,4 +53,8 @@ int cc_native_listen(int sockfd, int backlog) {
 
 int cc_native_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     return accept(sockfd, addr, addrlen);
+}
+
+int cc_native_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    return connect(sockfd, addr, addrlen);
 }

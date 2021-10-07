@@ -14,3 +14,6 @@ int cc_native_socket(int domain, int type, int protocol);
 int cc_native_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int cc_native_listen(int sockfd, int backlog);
 int cc_native_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+int cc_native_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int cc_native_shutdown(int sockfd, int how);
+off_t cc_native_lseek(int fd, off_t offset, int whence);

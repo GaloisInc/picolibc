@@ -99,6 +99,34 @@ int open(const char* name, int flags, ...) {
     return ret;
 }
 
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    printf("RECORDING: connect(%d, %p, %d)", sockfd, addr, addrlen);
+    int ret = cc_native_connect(sockfd, addr, addrlen);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+int shutdown(int sockfd, int how) {
+    printf("RECORDING: shutdown(%d, %d)", sockfd, how);
+    int ret = cc_native_shutdown(sockfd, how);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+off_t lseek(int fd, off_t offset, int whence) {
+    printf("RECORDING: lseek(%d, %d, %d)", fd, offset, whence);
+    int ret = cc_native_lseek(fd, offset, whence);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+// int ioctl(int fd, unsigned long request, ...) {
+//     printf("RECORDING: ioctl(%d, %d, ...)", fd, request);
+//     res = cc_native_ioctl() // What to do for varargs?
+//     printf(" = %d\n", ret);
+//     return ret;
+// }
+
 int close(int fd) {
     printf("RECORDING: close(%d)", fd);
     int ret = cc_native_close(fd);

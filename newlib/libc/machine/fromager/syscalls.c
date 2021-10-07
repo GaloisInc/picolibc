@@ -57,7 +57,8 @@ void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinl
 }
 
 int socket(int domain, int type, int protocol) {
-    __cc_valid_if(0, "unimplemented socket");
+    // __cc_valid_if(0, "unimplemented socket");
+    return 0;
 }
 
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
