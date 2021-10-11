@@ -13,6 +13,7 @@ define SOCK_STREAM
 define SOL_SOCKET
 
 define SO_ERROR
+define SO_REUSEADDR
 
 define AF_INET
 define AF_INET6
