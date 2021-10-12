@@ -280,3 +280,15 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) __attribute__((
 #endif
 
 #endif // FROMAGER_SIMPLE_MALLOC
+
+
+// Functions common to both malloc implementations
+
+#ifdef DEFINE_CALLOC
+void* calloc(size_t count, size_t size) {
+    size_t total_size;
+    __cc_valid_if(__builtin_mul_overflow(count, size, &total_size),
+            "calloc size overflowed");
+    return malloc(total_size);
+}
+#endif
