@@ -158,6 +158,7 @@ do_build() {
     keep_symbols=$keep_symbols,__llvm__ctlz__i64
     keep_symbols=$keep_symbols,__llvm__cttz__i32
     keep_symbols=$keep_symbols,__llvm__cttz__i64
+    keep_symbols=$keep_symbols,__llvm__usub__sat__i32
     keep_symbols=$keep_symbols,__cc_sdiv_i32_i32
     keep_symbols=$keep_symbols,__cc_srem_i32_i32
     keep_symbols=$keep_symbols,__cc_sdiv_i64_i64
