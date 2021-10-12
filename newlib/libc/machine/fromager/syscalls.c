@@ -60,7 +60,7 @@ void __cc_malloc_init_from_snapshot(void* addr, size_t len) __attribute__((noinl
 
 int socket(int domain, int type, int protocol) {
     // __cc_valid_if(0, "unimplemented socket");
-    return 0;
+    return 3;
 }
 
 int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
@@ -95,19 +95,21 @@ int open(const char* name, int flags, ...) {
 
 uid_t getuid(void) {
     // Hardcoding the UID on my machine.
-    return 1000;
+    return 1340825565;
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
-    __cc_valid_if(0, "unimplemented socket");
+    __cc_valid_if(0, "unimplemented connect");
 }
 
 int shutdown(int sockfd, int how) {
-    __cc_valid_if(0, "unimplemented shutdown");
+    // __cc_valid_if(0, "unimplemented shutdown");
+    return 0;
 }
 
 int fstat(int fd, struct stat* st) {
-    __cc_valid_if(0, "unimplemented fstat");
+    // __cc_valid_if(0, "unimplemented fstat");
+    return 0;
 }
 
 off_t lseek(int fd, off_t offset, int whence) {
@@ -119,7 +121,8 @@ int ioctl(int fd, unsigned long request, ...) {
 }
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
-    __cc_valid_if(0, "unimplemented poll");
+    // __cc_valid_if(0, "unimplemented poll");
+    return 1;
 }
 
 extern unsigned char read_buf_0[32];

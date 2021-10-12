@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <poll.h>
 
 void* cc_native_mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset);
 
@@ -17,3 +18,5 @@ int cc_native_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 int cc_native_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int cc_native_shutdown(int sockfd, int how);
 off_t cc_native_lseek(int fd, off_t offset, int whence);
+int cc_native_fstat(int fd, struct stat* st);
+int cc_native_poll(struct pollfd *fds, nfds_t nfds, int timeout);

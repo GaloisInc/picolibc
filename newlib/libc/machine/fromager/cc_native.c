@@ -39,6 +39,14 @@ off_t cc_native_lseek(int fd, off_t offset, int whence) {
     return lseek(fd, offset, whence);
 }
 
+int cc_native_fstat(int fd, struct stat* st) {
+    return fstat(fd, st);
+}
+
+int cc_native_poll(struct pollfd *fds, nfds_t nfds, int timeout) {
+    return poll(fds, nfds, timeout);
+}
+
 int cc_native_socket(int domain, int type, int protocol) {
     return socket(domain, type, protocol);
 }

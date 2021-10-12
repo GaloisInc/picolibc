@@ -113,6 +113,20 @@ int shutdown(int sockfd, int how) {
     return ret;
 }
 
+int fstat(int fd, struct stat* st) {
+    printf("RECORDING: fstat(%d, %p)", fd, st);
+    int ret = cc_native_fstat(fd, st);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
+    printf("RECORDING: poll(%p, %d, %d)", fds, nfds, timeout);
+    int ret = cc_native_poll(fds, nfds, timeout);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
 off_t lseek(int fd, off_t offset, int whence) {
     printf("RECORDING: lseek(%d, %d, %d)", fd, offset, whence);
     int ret = cc_native_lseek(fd, offset, whence);
