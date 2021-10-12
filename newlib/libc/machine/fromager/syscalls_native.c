@@ -72,8 +72,8 @@ void __cc_access_valid(char* start, char* end) {}
 void __cc_access_invalid(char* start, char* end) {}
 
 
-uintptr_t* __cc_advise_poison(char* start, char* end) {
-    return NULL;
+uintptr_t __cc_advise_poison_offset(char* start, uintptr_t len) {
+    return len;
 }
 
 void __cc_write_and_poison(uintptr_t* ptr, uintptr_t val) {
