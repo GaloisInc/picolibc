@@ -1,9 +1,13 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <signal.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
+// #include <time.h>
 #include <unistd.h>
 #include "cc_native.h"
 
@@ -65,4 +69,28 @@ int cc_native_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
 
 int cc_native_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
     return connect(sockfd, addr, addrlen);
+}
+
+pid_t cc_native_getpid(void) {
+    return getpid();
+}
+
+uid_t cc_native_getuid(void) {
+    return getuid();
+}
+
+// time_t cc_native_time(time_t * t) {
+//     return time(t);
+// }
+
+int cc_native_gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
+    return gettimeofday(p, tz);
+}
+
+int cc_native_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
+    return setsockopt(sockfd, level, optname, optval, optlen);
+}
+
+int cc_native_kill(pid_t pid, int sig) {
+    return kill(pid, sig);
 }

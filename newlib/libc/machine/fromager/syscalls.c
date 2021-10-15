@@ -18,7 +18,7 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
     return nbyte;
 }
 
-pid_t getpid() {
+pid_t getpid(void) {
     return 1;
 }
 
@@ -28,11 +28,12 @@ int kill(pid_t pid, int sig) {
 }
 
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
-    if (p != NULL) {
-        p->tv_sec = 0;
-        p->tv_usec = 0;
-    }
-    return 0;
+    // if (p != NULL) {
+    //     p->tv_sec = 0;
+    //     p->tv_usec = 0;
+    // }
+    // return 0;
+    __cc_valid_if(0, "unimplemented socket");
 }
 
 void _exit(int status) {
@@ -64,7 +65,7 @@ int socket(int domain, int type, int protocol) {
 }
 
 int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
-    // __cc_valid_if(0, "unimplemented setsockopt");
+    __cc_valid_if(0, "unimplemented setsockopt");
     return 0;
 }
 

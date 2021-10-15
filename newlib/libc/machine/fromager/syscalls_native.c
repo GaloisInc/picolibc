@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include "fromager.h"
 #include "cc_native.h"
@@ -113,6 +114,36 @@ int shutdown(int sockfd, int how) {
     return ret;
 }
 
+pid_t getpid(void) {
+    printf("RECORDING: getpid()");
+    pid_t ret = cc_native_getpid();
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+uid_t getuid(void) {
+    printf("RECORDING: getuid()");
+    uid_t ret = cc_native_getuid();
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+
+// time_t time(time_t * t) {
+//     printf("RECORDING: time(%p)", t);
+//     time_t ret = cc_native_time(t);
+//     printf(" = %d\n", ret);
+//     return ret;
+// }
+
+int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
+    printf("RECORDING: gettimeofday(%p,%p)", p, tz);
+    int ret = cc_native_gettimeofday(p, tz);
+    printf(" = %d (tv_sec = %ld)\n", ret, p->tv_sec);
+    return ret;
+}
+
+
 int fstat(int fd, struct stat* st) {
     printf("RECORDING: fstat(%d, %p)", fd, st);
     int ret = cc_native_fstat(fd, st);
@@ -121,15 +152,29 @@ int fstat(int fd, struct stat* st) {
 }
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
-    printf("RECORDING: poll(%p, %d, %d)", fds, nfds, timeout);
+    printf("RECORDING: poll(%p, %lu, %d)", fds, nfds, timeout);
     int ret = cc_native_poll(fds, nfds, timeout);
     printf(" = %d\n", ret);
     return ret;
 }
 
 off_t lseek(int fd, off_t offset, int whence) {
-    printf("RECORDING: lseek(%d, %d, %d)", fd, offset, whence);
+    printf("RECORDING: lseek(%d, %ld, %d)", fd, offset, whence);
     int ret = cc_native_lseek(fd, offset, whence);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+int kill(pid_t pid, int sig) {
+    printf("RECORDING: kill(%d, %d)", pid, sig);
+    int ret = cc_native_kill(pid, sig);
+    printf(" = %d\n", ret);
+    return ret;
+}
+
+int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
+    printf("RECORDING: setsockopt(%d, %d, %d, %p, %d)", sockfd, level, optname, optval, optlen);
+    int ret = cc_native_setsockopt(sockfd, level, optname, optval, optlen);
     printf(" = %d\n", ret);
     return ret;
 }
@@ -172,7 +217,7 @@ void print_buf(void* buf, int count) {
 }
 
 _READ_WRITE_RETURN_TYPE read(int fd, void* buf, size_t count) {
-    printf("RECORDING: read(%d, %p, %d)", fd, buf, count);
+    printf("RECORDING: read(%d, %p, %zu)", fd, buf, count);
     int ret = cc_native_read(fd, buf, count);
     printf(" = %d\n", ret);
     static int num = 0;
@@ -252,7 +297,7 @@ int listen(int sockfd, int backlog) {
 }
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
-    printf("RECORDING: accept(%d,%d,%d)", sockfd, addr->sa_family, addrlen); // TODO: Log full addr.
+    printf("RECORDING: accept(%d,%d,%p)", sockfd, addr->sa_family, addrlen); // TODO: Log full addr.
     int ret = cc_native_accept(sockfd, addr, addrlen);
     printf(" = %d\n", ret);
     return ret;
