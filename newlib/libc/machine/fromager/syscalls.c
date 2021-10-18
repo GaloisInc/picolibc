@@ -19,7 +19,7 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
 }
 
 pid_t getpid(void) {
-    return 1;
+    return 84880;
 }
 
 int kill(pid_t pid, int sig) {
@@ -27,13 +27,23 @@ int kill(pid_t pid, int sig) {
     return 0;
 }
 
+// extern const size_t TIMEOFDAY_COUNTS;
+// extern const long int timeofdays[TIMEOFDAY_COUNTS];
+// extern const long int *timeofdays;
+
+const size_t TIMEOFDAY_COUNTS = 7;
+const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634333955, 1634333965, 1634333965, 1634333965, 1634333965, 1634333965, 1634333965 };
+
+
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
-    // if (p != NULL) {
-    //     p->tv_sec = 0;
-    //     p->tv_usec = 0;
-    // }
-    // return 0;
-    __cc_valid_if(0, "unimplemented socket");
+    if (p != NULL) {
+        static int i = 0;
+        __cc_valid_if(i < TIMEOFDAY_COUNTS, "Too many gettimeofday calls.");
+        p->tv_sec = timeofdays[i];
+        // p->tv_usec = 0;
+        i++;
+    }
+    return 0;
 }
 
 void _exit(int status) {
@@ -65,7 +75,7 @@ int socket(int domain, int type, int protocol) {
 }
 
 int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
-    __cc_valid_if(0, "unimplemented setsockopt");
+    // __cc_valid_if(0, "unimplemented setsockopt");
     return 0;
 }
 
