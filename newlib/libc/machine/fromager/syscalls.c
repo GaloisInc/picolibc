@@ -19,7 +19,7 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
 }
 
 pid_t getpid(void) {
-    return 84880;
+    return 76654;
 }
 
 int kill(pid_t pid, int sig) {
@@ -32,7 +32,7 @@ int kill(pid_t pid, int sig) {
 // extern const long int *timeofdays;
 
 const size_t TIMEOFDAY_COUNTS = 7;
-const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634333955, 1634333965, 1634333965, 1634333965, 1634333965, 1634333965, 1634333965 };
+const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634649545, 1634649564, 1634649564, 1634649564, 1634649564, 1634649564, 1634649564 };
 
 
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
