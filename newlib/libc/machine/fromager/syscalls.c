@@ -19,7 +19,7 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
 }
 
 pid_t getpid(void) {
-    return 76654;
+    return 214727;
 }
 
 int kill(pid_t pid, int sig) {
@@ -32,7 +32,7 @@ int kill(pid_t pid, int sig) {
 // extern const long int *timeofdays;
 
 const size_t TIMEOFDAY_COUNTS = 7;
-const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634649545, 1634649564, 1634649564, 1634649564, 1634649564, 1634649564, 1634649564 };
+const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634696864, 1634696866, 1634696866, 1634696866, 1634696867, 1634696867, 1634696867 }
 
 
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
@@ -120,6 +120,10 @@ int shutdown(int sockfd, int how) {
 
 int fstat(int fd, struct stat* st) {
     // __cc_valid_if(0, "unimplemented fstat");
+    if (st) {
+        st->st_dev = 5;
+        st->st_ino = 1033;
+    }
     return 0;
 }
 

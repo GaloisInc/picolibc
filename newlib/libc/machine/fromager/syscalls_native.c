@@ -147,7 +147,7 @@ int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
 int fstat(int fd, struct stat* st) {
     printf("RECORDING: fstat(%d, %p)", fd, st);
     int ret = cc_native_fstat(fd, st);
-    printf(" = %d\n", ret);
+    printf(" = %d ({ st_dev: %lu, st_ino: %lu })\n", ret, st->st_dev, st->st_ino); // TODO: These are the only field we care about for openssl.
     return ret;
 }
 
