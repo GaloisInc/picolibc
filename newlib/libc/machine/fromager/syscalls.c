@@ -137,7 +137,7 @@ int ioctl(int fd, unsigned long request, ...) {
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
     // __cc_valid_if(0, "unimplemented poll");
-    if fds {
+    if (fds) {
         for (int i = 0; i < nfds; i++) {
             fds[i].revents = 1;
         }
