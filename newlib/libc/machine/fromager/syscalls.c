@@ -176,7 +176,5 @@ _READ_WRITE_RETURN_TYPE read(int fd, void* buf, size_t count) {
         ((uint8_t*) buf)[pos] = read_bufs[i][pos];
     }
     
-    i++;
-
-    return read_lens[i];
+    return read_lens[i++];
 }
