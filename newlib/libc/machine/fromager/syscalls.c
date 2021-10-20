@@ -19,7 +19,7 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
 }
 
 pid_t getpid(void) {
-    return 214727;
+    return 62243;
 }
 
 int kill(pid_t pid, int sig) {
@@ -32,7 +32,7 @@ int kill(pid_t pid, int sig) {
 // extern const long int *timeofdays;
 
 const size_t TIMEOFDAY_COUNTS = 7;
-const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634696864, 1634696866, 1634696866, 1634696866, 1634696867, 1634696867, 1634696867 };
+const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634740117, 1634740121, 1634740121, 1634740121, 1634740121, 1634740121, 1634740121 };
 
 
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
@@ -137,6 +137,11 @@ int ioctl(int fd, unsigned long request, ...) {
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
     // __cc_valid_if(0, "unimplemented poll");
+    if fds {
+        for (int i = 0; i < nfds; i++) {
+            fds[i].revents = 1;
+        }
+    }
     return 1;
 }
 

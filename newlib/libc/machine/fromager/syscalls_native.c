@@ -154,7 +154,7 @@ int fstat(int fd, struct stat* st) {
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
     printf("RECORDING: poll(%p, %lu, %d)", fds, nfds, timeout);
     int ret = cc_native_poll(fds, nfds, timeout);
-    printf(" = %d\n", ret);
+    printf(" = %d (revents = %d)\n", ret, fds->revents); // TODO: Only prints the first fds's revents.
     return ret;
 }
 
