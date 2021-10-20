@@ -32,7 +32,7 @@ int kill(pid_t pid, int sig) {
 // extern const long int *timeofdays;
 
 const size_t TIMEOFDAY_COUNTS = 7;
-const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634696864, 1634696866, 1634696866, 1634696866, 1634696867, 1634696867, 1634696867 }
+const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634696864, 1634696866, 1634696866, 1634696866, 1634696867, 1634696867, 1634696867 };
 
 
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
