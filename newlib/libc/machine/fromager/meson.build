@@ -27,6 +27,7 @@ inc_headers_machine = [
 
 srcs_machine_builtins = [
 	'llvm_intrin.c',
+	'llvm_intrin2.ll',
 ]
 
 srcs_machine_syscalls = [

@@ -90,14 +90,6 @@ uint64_t __llvm__cttz__i64(uint64_t x, int is_zero_undef) {
   return __ctzdi2(x);
 }
 
-uint32_t __llvm__usub__sat__i32(uint32_t x, uint32_t y) {
-    if (x < y) {
-        return 0;
-    } else {
-        return x - y;
-    }
-}
-
 
 int32_t __cc_sdiv_i32_i32(int32_t x, int32_t y) {
     int32_t sign = 1;
