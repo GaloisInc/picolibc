@@ -177,4 +177,6 @@ _READ_WRITE_RETURN_TYPE read(int fd, void* buf, size_t count) {
     }
     
     i++;
+
+    return read_lens[i];
 }
