@@ -19,7 +19,7 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
 }
 
 pid_t getpid(void) {
-    return 62243;
+    return 1;
 }
 
 int kill(pid_t pid, int sig) {
@@ -27,21 +27,10 @@ int kill(pid_t pid, int sig) {
     return 0;
 }
 
-// extern const size_t TIMEOFDAY_COUNTS;
-// extern const long int timeofdays[TIMEOFDAY_COUNTS];
-// extern const long int *timeofdays;
-
-const size_t TIMEOFDAY_COUNTS = 7;
-const long int timeofdays[TIMEOFDAY_COUNTS] = { 1634740117, 1634740121, 1634740121, 1634740121, 1634740121, 1634740121, 1634740121 };
-
-
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
     if (p != NULL) {
-        static int i = 0;
-        __cc_valid_if(i < TIMEOFDAY_COUNTS, "Too many gettimeofday calls.");
-        p->tv_sec = timeofdays[i];
-        // p->tv_usec = 0;
-        i++;
+        p->tv_sec = 1634000000;
+        p->tv_usec = 0;
     }
     return 0;
 }
@@ -105,8 +94,7 @@ int open(const char* name, int flags, ...) {
 }
 
 uid_t getuid(void) {
-    // Hardcoding the UID on my machine.
-    return 1340825565;
+    return 1000;
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {

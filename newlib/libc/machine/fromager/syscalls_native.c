@@ -115,17 +115,11 @@ int shutdown(int sockfd, int how) {
 }
 
 pid_t getpid(void) {
-    printf("RECORDING: getpid()");
-    pid_t ret = cc_native_getpid();
-    printf(" = %d\n", ret);
-    return ret;
+    return 1;
 }
 
 uid_t getuid(void) {
-    printf("RECORDING: getuid()");
-    uid_t ret = cc_native_getuid();
-    printf(" = %d\n", ret);
-    return ret;
+    return 1000;
 }
 
 
@@ -137,10 +131,11 @@ uid_t getuid(void) {
 // }
 
 int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
-    printf("RECORDING: gettimeofday(%p,%p)", p, tz);
-    int ret = cc_native_gettimeofday(p, tz);
-    printf(" = %d (tv_sec = %ld)\n", ret, p->tv_sec);
-    return ret;
+    if (p != NULL) {
+        p->tv_sec = 1634000000;
+        p->tv_usec = 0;
+    }
+    return 0;
 }
 
 
