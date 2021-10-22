@@ -18,20 +18,8 @@ _READ_WRITE_RETURN_TYPE write (int fd, const void *buf, size_t nbyte) {
     return nbyte;
 }
 
-pid_t getpid(void) {
-    return 1;
-}
-
 int kill(pid_t pid, int sig) {
     __cc_valid_if(0, "kill unsupported");
-    return 0;
-}
-
-int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
-    if (p != NULL) {
-        p->tv_sec = 1634000000;
-        p->tv_usec = 0;
-    }
     return 0;
 }
 
@@ -91,10 +79,6 @@ int close(int fd) {
 int open(const char* name, int flags, ...) {
     // __cc_valid_if(0, "unimplemented open");
     return 3;
-}
-
-uid_t getuid(void) {
-    return 1000;
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {

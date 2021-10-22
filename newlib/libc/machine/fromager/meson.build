@@ -38,6 +38,10 @@ srcs_machine_syscalls_native = [
   'syscalls_native.c',
 ]
 
+srcs_machine_syscalls_common = [
+  'syscalls_common.c',
+]
+
 srcs_machine_native = [
   'cc_native.c',
 ]
@@ -61,7 +65,7 @@ foreach target : targets
 			c_args: value[1]))
 
     static_library('machine_syscalls' + target,
-        srcs_machine_syscalls,
+        srcs_machine_syscalls + srcs_machine_syscalls_common,
         pic: false,
         dependencies: [global_dep],
         c_args: value[1],
@@ -69,7 +73,7 @@ foreach target : targets
         install_dir: instdir)
 
     static_library('machine_syscalls_native' + target,
-        srcs_machine_syscalls_native,
+        srcs_machine_syscalls_native + srcs_machine_syscalls_common,
         pic: false,
         dependencies: [global_dep],
         c_args: value[1],

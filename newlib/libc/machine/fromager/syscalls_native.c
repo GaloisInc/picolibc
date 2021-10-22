@@ -114,30 +114,6 @@ int shutdown(int sockfd, int how) {
     return ret;
 }
 
-pid_t getpid(void) {
-    return 1;
-}
-
-uid_t getuid(void) {
-    return 1000;
-}
-
-
-// time_t time(time_t * t) {
-//     printf("RECORDING: time(%p)", t);
-//     time_t ret = cc_native_time(t);
-//     printf(" = %d\n", ret);
-//     return ret;
-// }
-
-int gettimeofday (struct timeval *__restrict p, void *__restrict tz) {
-    if (p != NULL) {
-        p->tv_sec = 1634000000;
-        p->tv_usec = 0;
-    }
-    return 0;
-}
-
 
 int fstat(int fd, struct stat* st) {
     printf("RECORDING: fstat(%d, %p)", fd, st);
