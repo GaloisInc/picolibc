@@ -20,6 +20,9 @@ set -e
 # * cc_instrument: If set, function entries are instrumented with calls to
 #   `__cc_trace_exec`, recording the name of the function and the arguments it
 #   was called with.
+# * cc_flatten_init: If set, the program will be optimized using the
+#   --flatten-init pass (a.k.a LLVM memory folding).  This only applies to
+#   MicroRAM builds, not native builds.
 # * cc_keep_debug: If set, the output native binary will contain debug info.
 #   (By default, debug info is stripped instead.)
 #
@@ -111,6 +114,7 @@ do_build() {
     local work_dir="$cc_build_dir/link_$mode"
     mkdir -p "$work_dir"
 
+    local flatten_init_args=
     if [[ "$mode" == "microram" ]]; then
         # libmachine_builtins.a has already been optimized.  Further
         # optimization after linking risks replacing function bodies with
@@ -125,7 +129,14 @@ do_build() {
             "$work_dir/builtins-orig.bc" \
             --cc-set-intrinsic-attrs \
             -o "$work_dir/builtins-optnone.bc"
+
     fi
+
+    if [[ -n "$cc_flatten_init" ]] && [[ "$mode" == "microram" ]]; then
+        # Only use --flatten-init in microram mode
+        flatten_init_args=--flatten-init
+    fi
+
 
     local extra_link=""
     local extra_post_link=""
@@ -174,15 +185,15 @@ do_build() {
     fi
 
     # Optimize, removing unused public symbols
-    opt${LLVM_SUFFIX} \
-        -load "$LLVM_PASSES_HOME/passes.so" \
+    opt${LLVM_SUFFIX} -load "$LLVM_PASSES_HOME/passes.so" \
+        "$work_dir/driver-nosecret.bc" \
         --internalize --internalize-public-api-list="$keep_symbols" \
+        $strip_debug_args \
         $instrument_args \
+        $flatten_init_args \
         --force-vector-width=1 \
         --scalarizer --unroll-vectors --soft-float \
         -O3 --scalarizer --unroll-vectors -O1 \
-        $strip_debug_args \
-        "$work_dir/driver-nosecret.bc" \
         -o "$work_dir/driver-nosecret-opt.bc"
 
     # Link the driver code and the secrets.  No more optimizations should be run on
