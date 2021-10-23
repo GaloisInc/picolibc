@@ -177,6 +177,8 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
 # define TRACE(...) ((void)0)
 #endif
 
+#define POS_INIT 0x100000000ul
+
 #ifdef DEFINE_MALLOC
 void* malloc(size_t size) {
     void* out;
@@ -189,6 +191,13 @@ void* malloc(size_t size) {
 #ifdef DEFINE_FREE
 void free(void* ptr) {
     if (ptr == NULL) {
+        return;
+    }
+
+    if ((uintptr_t)ptr < POS_INIT) {
+        // XXX: hack - ignore free of non-heap pointers.  LLVM memory folding
+        // converts some heap allocations into statics, but doesn't prevent the
+        // program from calling `free` on those allocations later.
         return;
     }
 
@@ -221,7 +230,6 @@ void *realloc(void *ptr, size_t size) {
 #ifdef DEFINE_MEMALIGN
 void __cc_malloc_init(void* addr) __attribute__((noinline));
 
-#define POS_INIT 0x100000000ul
 // Two words of padding, so there's always at least one well-aligned word
 // somewhere within the padding.
 #define MALLOC_PADDING 64
