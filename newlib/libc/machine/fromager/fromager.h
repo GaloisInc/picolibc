@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 // MicroRAM compiler intrinsics.  These are implemented as builtins, not in C.
 
 // Indicate that the current trace is invalid.
