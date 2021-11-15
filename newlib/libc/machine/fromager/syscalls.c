@@ -117,28 +117,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
     return 1;
 }
 
-extern unsigned char read_buf_0[32];
-extern unsigned char read_buf_1[5];
-extern unsigned char read_buf_2[61];
-extern unsigned char read_buf_3[5];
-extern unsigned char read_buf_4[70];
-extern unsigned char read_buf_5[5];
-extern unsigned char read_buf_6[1];
-extern unsigned char read_buf_7[5];
-extern unsigned char read_buf_8[48];
-extern unsigned char read_buf_9[5];
-extern unsigned char read_buf_10[32];
-extern unsigned char read_buf_11[5];
-extern unsigned char read_buf_12[96];
-extern unsigned char read_buf_13[5];
-extern unsigned char read_buf_14[61];
-extern unsigned char read_buf_15[5];
-extern unsigned char read_buf_16[3];
-
-const size_t READ_COUNTS = 17;
-const unsigned char* read_bufs[READ_COUNTS] = {read_buf_0,read_buf_1,read_buf_2,read_buf_3,read_buf_4,read_buf_5,read_buf_6,read_buf_7,read_buf_8,read_buf_9,read_buf_10,read_buf_11,read_buf_12,read_buf_13,read_buf_14,read_buf_15,read_buf_16};
-const unsigned int read_lens[READ_COUNTS] = {32, 5, 61, 5, 70, 5, 1, 5, 48, 5, 32, 5, 96, 5, 61, 5, 3};
-
+// READ_COUNTS, read_bufs, and read_lens are defined in the driver and are generated from a recording run.
 _READ_WRITE_RETURN_TYPE read(int fd, void* buf, size_t count) {
     static int i = 0;
     __cc_valid_if(i < READ_COUNTS, "Too many read calls.");
