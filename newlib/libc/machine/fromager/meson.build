@@ -31,11 +31,11 @@ srcs_machine_builtins = [
 ]
 
 srcs_machine_syscalls = [
-  'syscalls.c',
+  'microram/syscalls.c',
 ]
 
 srcs_machine_syscalls_native = [
-  'syscalls_native.c',
+  'native/syscalls.c',
 ]
 
 srcs_machine_syscalls_common = [
