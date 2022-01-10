@@ -27,14 +27,23 @@ inc_headers_machine = [
 
 srcs_machine_builtins = [
 	'llvm_intrin.c',
+	'llvm_intrin2.ll',
 ]
 
 srcs_machine_syscalls = [
-  'syscalls.c',
+  'microram/syscalls.c',
 ]
 
 srcs_machine_syscalls_native = [
-  'syscalls_native.c',
+  'native/syscalls.c',
+]
+
+srcs_machine_syscalls_common = [
+  'syscalls_common.c',
+]
+
+srcs_machine_native = [
+  'cc_native.c',
 ]
 
 foreach target : targets
@@ -43,7 +52,7 @@ foreach target : targets
 	static_library('machine_builtins' + target,
 		srcs_machine_builtins,
 		pic: false,
-		include_directories: inc,
+        dependencies: [global_dep],
 		c_args: value[1] + ['-fno-builtin'],
         install: true,
         install_dir: instdir)
@@ -52,21 +61,28 @@ foreach target : targets
 		static_library('machine' + target,
 			srcs_machine,
 			pic: false,
-			include_directories: inc,
+            dependencies: [global_dep],
 			c_args: value[1]))
 
     static_library('machine_syscalls' + target,
-        srcs_machine_syscalls,
+        srcs_machine_syscalls + srcs_machine_syscalls_common,
         pic: false,
-        include_directories: inc,
+        dependencies: [global_dep],
         c_args: value[1],
         install: true,
         install_dir: instdir)
 
     static_library('machine_syscalls_native' + target,
-        srcs_machine_syscalls_native,
+        srcs_machine_syscalls_native + srcs_machine_syscalls_common,
         pic: false,
-        include_directories: inc,
+        dependencies: [global_dep],
+        c_args: value[1],
+        install: true,
+        install_dir: instdir)
+
+    static_library('machine_native' + target,
+        srcs_machine_native,
+        pic: false,
         c_args: value[1],
         install: true,
         install_dir: instdir)

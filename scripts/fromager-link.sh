@@ -20,6 +20,9 @@ set -e
 # * cc_instrument: If set, function entries are instrumented with calls to
 #   `__cc_trace_exec`, recording the name of the function and the arguments it
 #   was called with.
+# * cc_flatten_init: If set, the program will be optimized using the
+#   --flatten-init pass (a.k.a LLVM memory folding).  This only applies to
+#   MicroRAM builds, not native builds.
 # * cc_keep_debug: If set, the output native binary will contain debug info.
 #   (By default, debug info is stripped instead.)
 #
@@ -111,6 +114,7 @@ do_build() {
     local work_dir="$cc_build_dir/link_$mode"
     mkdir -p "$work_dir"
 
+    local flatten_init_args=
     if [[ "$mode" == "microram" ]]; then
         # libmachine_builtins.a has already been optimized.  Further
         # optimization after linking risks replacing function bodies with
@@ -125,7 +129,14 @@ do_build() {
             "$work_dir/builtins-orig.bc" \
             --cc-set-intrinsic-attrs \
             -o "$work_dir/builtins-optnone.bc"
+
     fi
+
+    if [[ -n "$cc_flatten_init" ]] && [[ "$mode" == "microram" ]]; then
+        # Only use --flatten-init in microram mode
+        flatten_init_args=--flatten-init
+    fi
+
 
     local extra_link=""
     local extra_post_link=""
@@ -158,6 +169,7 @@ do_build() {
     keep_symbols=$keep_symbols,__llvm__ctlz__i64
     keep_symbols=$keep_symbols,__llvm__cttz__i32
     keep_symbols=$keep_symbols,__llvm__cttz__i64
+    keep_symbols=$keep_symbols,__llvm__usub__sat__i32
     keep_symbols=$keep_symbols,__cc_sdiv_i32_i32
     keep_symbols=$keep_symbols,__cc_srem_i32_i32
     keep_symbols=$keep_symbols,__cc_sdiv_i64_i64
@@ -173,14 +185,15 @@ do_build() {
     fi
 
     # Optimize, removing unused public symbols
-    opt${LLVM_SUFFIX} \
-        -load "$LLVM_PASSES_HOME/passes.so" \
+    opt${LLVM_SUFFIX} -load "$LLVM_PASSES_HOME/passes.so" \
+        "$work_dir/driver-nosecret.bc" \
         --internalize --internalize-public-api-list="$keep_symbols" \
+        $strip_debug_args \
         $instrument_args \
+        $flatten_init_args \
+        --force-vector-width=1 \
         --scalarizer --unroll-vectors --soft-float \
         -O3 --scalarizer --unroll-vectors -O1 \
-        $strip_debug_args \
-        "$work_dir/driver-nosecret.bc" \
         -o "$work_dir/driver-nosecret-opt.bc"
 
     # Link the driver code and the secrets.  No more optimizations should be run on
@@ -201,9 +214,14 @@ do_build() {
         llvm-dis${LLVM_SUFFIX} "$work_dir/driver-full-nodebug.bc" -o "$cc_microram_output"
         sed -i -e 's/nofree//g' "$cc_microram_output"
     elif [[ "$mode" == "native" ]]; then
+        llvm-link${LLVM_SUFFIX} \
+            "$work_dir/driver-full-nodebug.bc" \
+            $(unpack_objects "$PICOLIBC_HOME/lib/libmachine_native.a") \
+            -o "$work_dir/driver-full-native.bc"
+
         clang++${LLVM_SUFFIX} \
             -o "$cc_native_output" \
-            "$work_dir/driver-full-nodebug.bc"
+            "$work_dir/driver-full-native.bc"
     fi
 }
 

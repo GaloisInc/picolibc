@@ -32,10 +32,17 @@ SUCH DAMAGE.
    not support <dirent.h>, we will get this file which uses #error to force
    an error.  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#error "<dirent.h> not supported"
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+// #error "<dirent.h> not supported"
+// #ifdef __cplusplus
+// }
+// #endif
+
+// From: /usr/include/dirent.h
+typedef struct __dirstream DIR;
+
+struct dirent {
+  char   d_name[256];
+};

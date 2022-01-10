@@ -45,6 +45,7 @@ inc_sys_headers_all = [
   'fenv.h',
   'file.h',
   'iconvnls.h',
+  'ioctl.h',
   '_intsup.h',
   '_locale.h',
   'lock.h',
@@ -55,6 +56,7 @@ inc_sys_headers_all = [
   'select.h',
   'signal.h',
   '_sigset.h',
+  'socket.h',
   'stat.h',
   '_stdint.h',
   'string.h',
@@ -68,6 +70,7 @@ inc_sys_headers_all = [
   'tree.h',
   '_types.h',
   'types.h',
+  'un.h',
   'unistd.h',
   'utime.h',
   'wait.h'

@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 // MicroRAM compiler intrinsics.  These are implemented as builtins, not in C.
 
 // Indicate that the current trace is invalid.
@@ -91,6 +93,10 @@ void __cc_trace_exec(
         uintptr_t arg5,
         uintptr_t arg6,
         uintptr_t arg7);
+
+extern const size_t READ_COUNTS;
+extern const unsigned char** read_bufs;
+extern const unsigned int* read_lens;
 
 #ifdef __cplusplus
 }

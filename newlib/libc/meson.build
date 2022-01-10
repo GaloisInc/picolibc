@@ -145,11 +145,15 @@ if machine_dirs.has_key(host_cpu_family)
   libnames = ['machine'] + libnames
 endif
 
+subdir('include')
+
+global_dep = declare_dependency(
+  dependencies: [bits_generated],
+  include_directories: inc)
+
 foreach libdir : libdirs
   subdir(libdir)
 endforeach
-
-subdir('include')
 
 foreach target : targets
   value = get_variable('target_' + target)

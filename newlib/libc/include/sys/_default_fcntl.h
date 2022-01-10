@@ -39,52 +39,7 @@ extern "C" {
 #define	_FPATH		0x2000000
 #endif
 
-#define	O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
-
-/*
- * Flag values for open(2) and fcntl(2)
- * The kernel adds 1 to the open modes to turn it into some
- * combination of FREAD and FWRITE.
- */
-#define	O_RDONLY	0		/* +1 == FREAD */
-#define	O_WRONLY	1		/* +1 == FWRITE */
-#define	O_RDWR		2		/* +1 == FREAD|FWRITE */
-#define	O_APPEND	_FAPPEND
-#define	O_CREAT		_FCREAT
-#define	O_TRUNC		_FTRUNC
-#define	O_EXCL		_FEXCL
-#define O_SYNC		_FSYNC
-/*	O_NDELAY	_FNDELAY 	set in include/fcntl.h */
-/*	O_NDELAY	_FNBIO 		set in include/fcntl.h */
-#define	O_NONBLOCK	_FNONBLOCK
-#define	O_NOCTTY	_FNOCTTY
-
-/* POSIX-1.2008 specific flags */
-#if __POSIX_VISIBLE >= 200809
-#define	O_CLOEXEC	_FNOINHERIT
-#define	O_NOFOLLOW	_FNOFOLLOW
-#define	O_DIRECTORY	_FDIRECTORY
-#define	O_EXEC		_FEXECSRCH
-#define	O_SEARCH	_FEXECSRCH
-#endif
-
-#if __BSD_VISIBLE
-#define	O_DIRECT	_FDIRECT
-#endif
-
-#if defined (__CYGWIN__)
-#define O_BINARY	_FBINARY
-#define O_TEXT		_FTEXT
-#define O_DSYNC         _FSYNC
-#define O_RSYNC         _FSYNC
-
-/* Linux-specific flags */
-#if __GNU_VISIBLE
-#define O_TMPFILE	_FTMPFILE
-#define O_NOATIME	_FNOATIME
-#define O_PATH		_FPATH
-#endif
-#endif
+#include <bits/fcntl.h>
 
 #if __MISC_VISIBLE
 

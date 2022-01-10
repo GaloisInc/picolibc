@@ -66,6 +66,6 @@ foreach target : targets
 	       static_library('fenv' + target,
 			      srcs_fenv_use,
 			      pic: false,
-			      include_directories: inc,
+			      dependencies: [global_dep],
 			      c_args: value[1]))
 endforeach

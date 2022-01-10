@@ -1,0 +1,18 @@
+output_guard BITS_FCNTL_INCLUDED
+include fcntl.h
+
+define O_RDONLY
+define O_WRONLY
+define O_RDWR
+define O_APPEND
+define O_CREAT
+define O_TRUNC
+define O_EXCL
+define O_SYNC
+define O_NONBLOCK
+define O_NOCTTY
+define O_CLOEXEC
+define O_NOFOLLOW
+define O_DIRECTORY
+
+define O_ACCMODE

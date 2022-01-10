@@ -32,8 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+subdir('bits')
+subdir('arpa')
 subdir('sys')
 subdir('machine')
+subdir('netinet')
 subdir('ssp')
 
 inc_headers = [
@@ -68,7 +71,10 @@ inc_headers = [
   'math.h',
   'memory.h',
   'newlib.h',
+  'netdb.h',
+  'noni.h',
   'paths.h',
+  'poll.h',
   'pwd.h',
   'regdef.h',
   'regex.h',
@@ -82,7 +88,9 @@ inc_headers = [
   'string.h',
   'strings.h',
   '_syslist.h',
+  'syslog.h',
   'tar.h',
+  'termio.h',
   'termios.h',
   'threads.h',
   'time.h',

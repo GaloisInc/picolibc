@@ -63,7 +63,7 @@ foreach target : targets
 		static_library('stdio64' + target,
 			srcs_stdio64_use,
 			pic: false,
-			include_directories: inc,
+			dependencies: [global_dep],
 			c_args: value[1]))
 endforeach
 

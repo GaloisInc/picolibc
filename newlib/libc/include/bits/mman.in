@@ -1,0 +1,12 @@
+output_guard BITS_MMAN_INCLUDED
+include sys/mman.h
+
+define PROT_READ
+define PROT_WRITE
+define PROT_EXEC
+define PROT_NONE
+
+define MAP_SHARED
+define MAP_PRIVATE
+define MAP_FIXED
+define MAP_ANONYMOUS

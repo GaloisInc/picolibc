@@ -1,0 +1,25 @@
+output_guard BITS_SOCKET_INCLUDED
+include sys/socket.h
+
+struct sockaddr
+    sa_family_t sa_family;
+    @sa_data  char sa_data[14];
+
+define SOCK_DGRAM
+define SOCK_RAW
+define SOCK_SEQPACKET
+define SOCK_STREAM
+
+define SOL_SOCKET
+
+define SO_ERROR
+define SO_REUSEADDR
+
+define AF_INET
+define AF_INET6
+define AF_UNIX
+define AF_UNSPEC
+
+define SHUT_RD
+define SHUT_RDWR
+define SHUT_WR

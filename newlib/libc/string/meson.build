@@ -183,13 +183,13 @@ foreach target : targets
 				    srcs_strcmp_use,
 				    pic: false,
 				    c_args: value[1] + cargs_strcmp,
-				    include_directories: inc))
+				    dependencies: [global_dep]))
 	strcmp_objs = get_variable('lib_strcmp' + target).extract_all_objects(recursive:true)
 	set_variable('lib_string' + target,
 		static_library('string' + target,
 			       srcs_string_use,
 			       objects: strcmp_objs,
 			       pic: false,
-			       include_directories: inc,
+			       dependencies: [global_dep],
 			       c_args: value[1]))
 endforeach
