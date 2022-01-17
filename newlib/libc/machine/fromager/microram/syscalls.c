@@ -24,6 +24,7 @@ int kill(pid_t pid, int sig) {
 }
 
 void _exit(int status) {
+    __cc_answer(0);
     for (;;) {
         // Ensure there's an observable side effect inside the loop, so the
         // compiler can't optimize it away.
