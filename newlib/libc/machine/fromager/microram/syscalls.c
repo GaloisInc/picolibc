@@ -24,11 +24,8 @@ int kill(pid_t pid, int sig) {
 }
 
 void _exit(int status) {
-    for (;;) {
-        // Ensure there's an observable side effect inside the loop, so the
-        // compiler can't optimize it away.
-        __cc_trace("_exit");
-    }
+    // Note that `_exit` and `__cc_answer` are both declared `noreturn`.
+    __cc_answer(0);
 }
 
 void __cc_malloc_init(void* addr) __attribute__((noinline)) {
