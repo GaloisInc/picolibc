@@ -16,7 +16,7 @@ void __cc_flag_bug(void);
 
 // Terminate the program with the given code.  This corresponds to the MicroRAM
 // `Ianswer` instruction.  Currently the exit code is ignored.
-void __cc_answer(int code);
+void __cc_answer(int code) __attribute__((noreturn));
 
 // Print a message during evaluation in the MicroRAM interpreter.
 void __cc_trace(const char* msg);
